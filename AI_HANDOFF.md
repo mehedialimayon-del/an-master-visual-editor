@@ -86,3 +86,10 @@ User wants Steps 1–5 done together, with real verified code commits, before pr
 - Exposed action in mobile Pages > Components contextual sheet. Commits: 8164131b55d107f5e92361ddcde040d674bc2ffa and db6090e5b403b4dd819a9762af3cbbc7fbe7f8d6.
 - Added Playwright regression for save/reload/insert/undo of two-element templates at b94d0817d0a8eaf58e386cef00827834b3065432.
 - New browser QA and Pages deployment MUST be checked before claiming PASS. Advanced animation timeline, independent responsive breakpoint editor and physical Samsung device QA remain pending.
+
+
+## 2026-11-21 Animation timeline + custom viewport phase
+- Baseline: 19/19 Playwright tests and Pages deployment #81 passed at 7ba94b9df73f2c3f71047c4f17fcd208ea5fdfcd.
+- Added selected-element timeline scrub, play, pause controls reusing effect/speed/delay. This is a simple animation preview scrub, NOT a multi-track keyframe timeline. Commit 87b3a893a037f93ddb530d282aac09fd2c6a9e1e; regression commit 984a1b395996f1c2644799fa8f2eb7bc9fdbf2cd.
+- Added custom responsive viewport width/height in Screen panel (240–1920 by 320–2160) and persisted custom device option after save/reload/undo. Commits 899285af62234bf991060a580cf66dd359885658 and 8fa4e14990af2e3acd6f3f1f537f555975ffb24f. This is a viewport dimension editor, NOT independent per-breakpoint element overrides.
+- Added Playwright viewport persistence regression at 57d5c9d26358c6f6f2cbc3c8d1ad7ea31230fb0a. Check latest GitHub Actions logs for 21/21 PASS before claiming success. Physical Samsung device QA remains blocked.
