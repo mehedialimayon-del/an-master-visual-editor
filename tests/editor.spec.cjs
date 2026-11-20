@@ -261,7 +261,8 @@ test('style, component library, save reload, delete undo and export regression',
  await page.locator('#label').fill('QA Action');
  await page.locator('#color').fill('#ffffff');
  await page.locator('#saveComponent').click();
- await expect(page.locator('#components option')).toHaveCount(1);
+ await expect(page.locator('#components option')).toHaveCount(2);
+ await page.locator('#components').selectOption('0');
  await page.locator('#insertComponent').click();
  await expect(page.locator('.item[data-type="button"]')).toHaveCount(2);
  await page.locator('#undo').click();
