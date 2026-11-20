@@ -311,3 +311,16 @@ test('property editing supports undo and redo without losing stored element',asy
  await page.locator('#redo').click();
  await expect(page.locator('.item[data-type="text"]')).toHaveCSS('color','rgb(18, 52, 86)');
 });
+
+test('zero opacity remains zero and reduced motion disables canvas animation',async({page})=>{
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ await page.locator('#opacity').fill('0');
+ await expect(page.locator('.item[data-type="text"]')).toHaveCSS('opacity','0');
+ await page.locator('#effect').selectOption('pulse');
+ await expect(page.locator('.item[data-type="text"] .effect-pulse')).toHaveCSS('animation-name','none');
+ await page.locator('#save').click();
+ await page.reload();
+ await expect(page.locator('.item[data-type="text"]')).toHaveCSS('opacity','0');
+});
