@@ -344,3 +344,15 @@ test('multi-element page template saves and inserts both elements after reload',
  await expect(page.locator('.item[data-type="text"]')).toHaveCount(1);
  await expect(page.locator('.item[data-type="button"]')).toHaveCount(1);
 });
+
+test('animation timeline can seek pause and resume selected text',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ await page.locator('#effect').selectOption('pulse');
+ await page.locator('#timelineScrub').fill('1.5');
+ await expect(page.locator('.item.selected .content')).toHaveCSS('animation-play-state','paused');
+ await page.locator('#timelinePlay').click();
+ await expect(page.locator('.item.selected .content')).toHaveCSS('animation-play-state','running');
+ await page.locator('#timelinePause').click();
+ await expect(page.locator('.item.selected .content')).toHaveCSS('animation-play-state','paused');
+});
