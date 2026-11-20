@@ -31,3 +31,16 @@ test('mobile layout, component and export',async({page})=>{
  const download=await downloadPromise;
  expect(download.suggestedFilename()).toBe('visual-site.html');
 });
+
+test('canvas-first mobile interface shows dock and contextual tools',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4173/');
+ await expect(page.locator('.mobile-dock')).toBeVisible();
+ await expect(page.locator('.tools')).toBeHidden();
+ await page.locator('.mobile-dock [data-panel="screen"]').click();
+ await expect(page.locator('.tools')).toBeVisible();
+ await expect(page.locator('#sheetTitle')).toHaveText('Screen & Layout');
+ await page.locator('#closeSheet').click();
+ await expect(page.locator('.tools')).toBeHidden();
+ await expect(page.locator('#canvas')).toBeVisible();
+});
