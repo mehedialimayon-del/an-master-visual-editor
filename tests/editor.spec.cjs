@@ -356,3 +356,15 @@ test('animation timeline can seek pause and resume selected text',async({page})=
  await page.locator('#timelinePause').click();
  await expect(page.locator('.item.selected .content')).toHaveCSS('animation-play-state','paused');
 });
+
+test('custom responsive viewport saves and restores after reload',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#breakpointWidth').fill('412');
+ await page.locator('#breakpointHeight').fill('915');
+ await page.locator('#applyBreakpoint').click();
+ await expect(page.locator('#device')).toHaveValue('412x915');
+ await page.locator('#save').click();
+ await page.reload();
+ await expect(page.locator('#device')).toHaveValue('412x915');
+ await expect(page.locator('#canvas')).toHaveCSS('aspect-ratio','412 / 915');
+});
