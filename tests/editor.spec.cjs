@@ -368,3 +368,20 @@ test('custom responsive viewport saves and restores after reload',async({page})=
  await expect(page.locator('#device')).toHaveValue('412x915');
  await expect(page.locator('#canvas')).toHaveCSS('aspect-ratio','412 / 915');
 });
+
+test('two-point keyframes persist and can be undone',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ await page.locator('#kfStartOpacity').fill('15');
+ await page.locator('#kfEndOpacity').fill('95');
+ await page.locator('#kfStartY').fill('40');
+ await page.locator('#kfEndY').fill('0');
+ await page.locator('#applyKeyframes').click();
+ await expect.poll(()=>page.locator('.item.selected .content').evaluate(el=>el.getAnimations().length)).toBeGreaterThan(0);
+ await page.locator('#save').click();
+ await page.reload();
+ await expect.poll(()=>page.locator('.item[data-type="text"] .content').evaluate(el=>el.getAnimations().length)).toBeGreaterThan(0);
+ await page.locator('.item[data-type="text"]').click();
+ await page.locator('#clearKeyframes').click();
+ await expect(page.locator('.item[data-type="text"] .content')).toHaveCount(1);
+});
