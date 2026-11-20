@@ -172,3 +172,66 @@ test('export retains text URL and page navigation',async({page,context})=>{
  await expect(exported.locator('[data-site-page="0"]')).toBeHidden();
  await exported.close();
 });
+
+for(const device of [
+ {name:'Samsung S23 Ultra portrait',width:384,height:824},
+ {name:'Samsung A07 portrait',width:360,height:800},
+ {name:'Samsung S23 Ultra landscape',width:824,height:384},
+ {name:'Samsung A07 landscape',width:800,height:360}
+]){
+ test('responsive contextual editor - '+device.name,async({page})=>{
+  await page.setViewportSize({width:device.width,height:device.height});
+  await page.goto('http://127.0.0.1:4173/');
+  await expect(page.locator('.mobile-dock')).toBeVisible();
+  await expect(page.locator('#canvas')).toBeVisible();
+  const metrics=await page.evaluate(()=>{
+   const header=document.querySelector('header').getBoundingClientRect();
+   const dock=document.querySelector('.mobile-dock').getBoundingClientRect();
+   const canvas=document.querySelector('#canvas').getBoundingClientRect();
+   return {innerWidth,innerHeight,scrollWidth:document.documentElement.scrollWidth,
+    headerTop:header.top,dockBottom:dock.bottom,canvasWidth:canvas.width,
+    dockHeight:dock.height};
+  });
+  expect(metrics.scrollWidth).toBeLessThanOrEqual(device.width+2);
+  expect(metrics.headerTop).toBeGreaterThanOrEqual(-1);
+  expect(metrics.dockBottom).toBeLessThanOrEqual(device.height+2);
+  expect(metrics.canvasWidth).toBeGreaterThan(100);
+  await page.locator('.mobile-dock [data-panel="text"]').click();
+  await expect(page.locator('.tools')).toBeVisible();
+  await page.locator('.sheet-actions button').filter({hasText:'+ Text'}).click();
+  const input=page.locator('#label');
+  await input.focus();
+  await input.fill('Mobile keyboard field');
+  await expect(page.locator('.item[data-type="text"]')).toContainText('Mobile keyboard field');
+  await expect(input).toBeFocused();
+  await page.locator('#closeSheet').click();
+  await expect(page.locator('.tools')).toBeHidden();
+ });
+}
+test('mobile touch drag and resize persists after reload',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:384,height:824},hasTouch:true,isMobile:true});
+ const page=await context.newPage();
+ page.on('dialog',d=>d.accept());
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('.mobile-dock [data-panel="button"]').tap();
+ await page.locator('.sheet-actions button').filter({hasText:'+ Select Hotspot Area'}).tap();
+ await expect(page.locator('.item[data-type="hotspot"]')).toHaveCount(1);
+ await page.locator('#closeSheet').tap();
+ const before=await page.locator('.item[data-type="hotspot"]').boundingBox();
+ const moved=await page.evaluate(()=>{
+  const el=document.querySelector('.item[data-type="hotspot"]');
+  const r=el.getBoundingClientRect();const x=r.x+r.width/2,y=r.y+r.height/2;
+  const event=(name,px,py)=>el.dispatchEvent(new PointerEvent(name,{bubbles:true,cancelable:true,pointerId:7,pointerType:'touch',isPrimary:true,clientX:px,clientY:py,button:0}));
+  event('pointerdown',x,y);window.dispatchEvent(new PointerEvent('pointermove',{bubbles:true,cancelable:true,pointerId:7,pointerType:'touch',clientX:x+24,clientY:y+16}));
+  window.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:7,pointerType:'touch',clientX:x+24,clientY:y+16}));
+  return true;
+ });
+ expect(moved).toBe(true);
+ const after=await page.locator('.item[data-type="hotspot"]').boundingBox();
+ expect(after.x).toBeGreaterThan(before.x+4);
+ await page.locator('#save').evaluate(el=>el.click());
+ await page.reload();
+ const persisted=await page.locator('.item[data-type="hotspot"]').boundingBox();
+ expect(persisted.x).toBeGreaterThan(before.x+4);
+ await context.close();
+});
