@@ -238,8 +238,9 @@ test('mobile touch drag and resize persists after reload',async({browser})=>{
 
 test('image upload replaces selected image and undo restores previous image',async({page})=>{
  await page.goto('http://127.0.0.1:4173/');
- const first=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9WlT8lMAAAAASUVORK5CYII=','base64');
- const second=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAX9R4bYAAAAASUVORK5CYII=','base64');
+ const makePng=async(color)=>Buffer.from((await page.evaluate((fill)=>{const canvas=document.createElement('canvas');canvas.width=16;canvas.height=16;const ctx=canvas.getContext('2d');ctx.fillStyle=fill;ctx.fillRect(0,0,16,16);return canvas.toDataURL('image/png')},color)).split(',')[1],'base64');
+ const first=await makePng('#ff6600');
+ const second=await makePng('#000000');
  await page.locator('#image').setInputFiles({name:'first.png',mimeType:'image/png',buffer:first});
  await expect(page.locator('.item[data-type="image"]')).toHaveCount(1);
  const original=await page.locator('.item[data-type="image"] img').getAttribute('src');
