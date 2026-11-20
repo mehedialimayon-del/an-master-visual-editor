@@ -443,3 +443,29 @@ test('exported keyframe animation actually plays in standalone HTML',async({page
  expect(await target.evaluate(e=>e.getAnimations().length)).toBeGreaterThan(0);
  await exported.close();
 });
+
+for(const device of [{name:'S23 Ultra',width:384,height:824},{name:'A07',width:360,height:800}]){
+ test('mobile deep QA '+device.name+' keyboard edit, panel navigation and save reload',async({browser})=>{
+  const context=await browser.newContext({viewport:{width:device.width,height:device.height},hasTouch:true,isMobile:true});
+  const page=await context.newPage();
+  await page.goto('http://127.0.0.1:4173/');
+  await expect(page.locator('.mobile-dock')).toBeVisible();
+  await page.locator('.mobile-dock [data-panel="text"]').tap();
+  await page.locator('.sheet-actions button').filter({hasText:'+ Text'}).tap();
+  const label=page.locator('#label');
+  await label.fill('Mobile '+device.name+' keyboard QA');
+  await expect(page.locator('.item[data-type="text"]')).toContainText('Mobile '+device.name+' keyboard QA');
+  await page.locator('#closeSheet').tap();
+  await expect(page.locator('.tools')).toBeHidden();
+  await page.locator('.mobile-dock [data-panel="screen"]').tap();
+  await expect(page.locator('#sheetTitle')).toHaveText('Screen & Layout');
+  await page.locator('#closeSheet').tap();
+  await page.locator('#save').evaluate(el=>el.click());
+  await page.reload();
+  await expect(page.locator('.item[data-type="text"]')).toContainText('Mobile '+device.name+' keyboard QA');
+  const metrics=await page.evaluate(()=>({width:document.documentElement.scrollWidth,viewport:innerWidth,dock:document.querySelector('.mobile-dock').getBoundingClientRect().toJSON()}));
+  expect(metrics.width).toBeLessThanOrEqual(metrics.viewport+2);
+  expect(metrics.dock.bottom).toBeLessThanOrEqual(device.height+2);
+  await context.close();
+ });
+}
