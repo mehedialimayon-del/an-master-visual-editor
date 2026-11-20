@@ -46,3 +46,17 @@ test('canvas-first mobile interface shows dock and contextual tools',async({page
  await expect(page.locator('.tools')).toBeHidden();
  await expect(page.locator('#canvas')).toBeVisible();
 });
+
+test('mobile content deletion is confirmed and undo restores item',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ await expect(page.locator('.item')).toHaveCount(1);
+ await page.locator('.mobile-dock [data-panel="text"]').click();
+ await expect(page.getByRole('button',{name:'Delete Selected Content'})).toBeVisible();
+ page.once('dialog',dialog=>dialog.accept());
+ await page.getByRole('button',{name:'Delete Selected Content'}).click();
+ await expect(page.locator('.item')).toHaveCount(0);
+ await page.locator('#undo').click();
+ await expect(page.locator('.item')).toHaveCount(1);
+});
