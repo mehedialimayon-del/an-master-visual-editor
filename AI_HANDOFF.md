@@ -93,3 +93,8 @@ User wants Steps 1–5 done together, with real verified code commits, before pr
 - Added selected-element timeline scrub, play, pause controls reusing effect/speed/delay. This is a simple animation preview scrub, NOT a multi-track keyframe timeline. Commit 87b3a893a037f93ddb530d282aac09fd2c6a9e1e; regression commit 984a1b395996f1c2644799fa8f2eb7bc9fdbf2cd.
 - Added custom responsive viewport width/height in Screen panel (240–1920 by 320–2160) and persisted custom device option after save/reload/undo. Commits 899285af62234bf991060a580cf66dd359885658 and 8fa4e14990af2e3acd6f3f1f537f555975ffb24f. This is a viewport dimension editor, NOT independent per-breakpoint element overrides.
 - Added Playwright viewport persistence regression at 57d5c9d26358c6f6f2cbc3c8d1ad7ea31230fb0a. Check latest GitHub Actions logs for 21/21 PASS before claiming success. Physical Samsung device QA remains blocked.
+
+## 2026-11-21 Custom viewport restore fix
+- Browser QA run 44822884714: 20 passed, 1 failed. The failed test was custom responsive viewport persistence after reload; device selector received empty value instead of 412x915.
+- Root cause: ensureDeviceOption used a double-escaped digit regex literal and rejected valid custom dimensions. Fixed in index.html commit 48b54b171d1e943929d6f3220adee68d0d3aaa0d. Existing Playwright regression at tests/editor.spec.cjs checks 412x915 after reload.
+- Check subsequent Browser QA and Pages deployment before claiming 21/21 PASS. Physical Samsung QA and full keyframe/per-breakpoint overrides remain pending.
