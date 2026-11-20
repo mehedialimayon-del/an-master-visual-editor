@@ -409,3 +409,37 @@ test('saved breakpoint layout restores independently after device switch and rel
  await expect(page.locator('.item[data-type="text"]')).toHaveCount(1);
  await expect(page.locator('#device')).toHaveValue('390x640');
 });
+
+test('breakpoint saved positions survive switch reload and undo redo',async({page})=>{
+ page.on('dialog',d=>d.accept());
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ await page.locator('#saveBreakpointLayout').click();
+ const original=await page.locator('.item[data-type="text"]').evaluate(e=>e.style.left);
+ await page.locator('#device').selectOption('768x1024');
+ await page.locator('#undo').click();
+ await expect(page.locator('#device')).toHaveValue('390x640');
+ await expect(page.locator('.item[data-type="text"]')).toHaveCSS('left',await page.locator('.item[data-type="text"]').evaluate(e=>getComputedStyle(e).left));
+ await page.locator('#redo').click();
+ await expect(page.locator('#device')).toHaveValue('768x1024');
+ await page.locator('#save').click();
+ await page.reload();
+ await page.locator('#device').selectOption('390x640');
+ expect(await page.locator('.item[data-type="text"]').evaluate(e=>e.style.left)).toBe(original);
+});
+test('exported keyframe animation actually plays in standalone HTML',async({page,browser})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ await page.locator('#applyKeyframes').click();
+ const promise=page.waitForEvent('download');
+ await page.locator('#export').click();
+ const download=await promise;
+ const html=require('fs').readFileSync(await download.path(),'utf8');
+ const exported=await browser.newPage();
+ await exported.goto('http://127.0.0.1:4173/');
+ await exported.setContent(html);
+ const target=exported.locator('[style*="anCustomKeyframe"]').first();
+ await expect(target).toHaveCount(1);
+ expect(await target.evaluate(e=>e.getAnimations().length)).toBeGreaterThan(0);
+ await exported.close();
+});
