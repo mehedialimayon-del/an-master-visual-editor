@@ -522,3 +522,18 @@ test('Stage 7 local assistant inserts reusable design without external calls',as
  await page.locator('#assistantInsert').click();
  await expect(page.locator('.item[data-type="button"]')).toContainText('Get Started');
 });
+
+test('Stage 8 form builder persists and exports working submission handler',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ page.on('dialog',async d=>d.accept(d.message().includes('Form title')?'Contact Form':d.message().includes('Fields')?'Name, Email':'download'));
+ await page.locator('#ribbonForm').click();
+ await expect(page.locator('.item[data-type="form"] input')).toHaveCount(2);
+ await page.locator('#save').click();
+ await page.reload();
+ await expect(page.locator('.item[data-type="form"] input')).toHaveCount(2);
+ const download=page.waitForEvent('download');
+ await page.locator('#export').click();
+ const html=require('fs').readFileSync(await (await download).path(),'utf8');
+ expect(html).toContain('data-an-form');
+ expect(html).toContain('form-submission.json');
+});
