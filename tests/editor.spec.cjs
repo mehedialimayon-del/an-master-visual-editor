@@ -62,3 +62,28 @@ test('mobile content deletion is confirmed and undo restores item',async({page})
  await page.locator('#undo').click();
  await expect(page.locator('.item')).toHaveCount(1);
 });
+
+test('manual hotspot settings, save reload, undo and export',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('.mobile-dock [data-panel="button"]').click();
+ await page.locator('#addHotspot').evaluate(el=>el.click());
+ await expect(page.locator('.item[data-type="hotspot"]')).toHaveCount(1);
+ await page.locator('#hotspotGlow').selectOption('neon');
+ await page.locator('#hotspotIcon').fill('★');
+ await page.locator('#url').fill('https://example.com');
+ await page.locator('#url').dispatchEvent('input');
+ await expect(page.locator('.item[data-type="hotspot"]')).toContainText('★');
+ page.once('dialog',d=>d.accept());
+ await page.locator('#save').click();
+ await page.reload();
+ await expect(page.locator('.item[data-type="hotspot"]')).toHaveCount(1);
+ await page.locator('.item[data-type="hotspot"]').click();
+ const downloadPromise=page.waitForEvent('download');
+ await page.locator('#export').evaluate(el=>el.click());
+ const download=await downloadPromise;
+ const fs=require('fs');
+ const html=fs.readFileSync(await download.path(),'utf8');
+ expect(html).toContain('an-hotspot');
+ expect(html).toContain('https://example.com');
+});
