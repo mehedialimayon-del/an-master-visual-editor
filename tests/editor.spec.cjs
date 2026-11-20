@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 test('desktop controls and page history',async({page})=>{
  await page.goto('http://127.0.0.1:4173/');
- await page.getByRole('button',{name:'+ Text'}).click();
+ await page.locator('#text').click();
  await expect(page.locator('.item')).toHaveCount(1);
  await page.locator('#label').fill('QA Desktop');
  await expect(page.locator('.item')).toContainText('QA Desktop');
