@@ -69,3 +69,11 @@ User wants Steps 1–5 done together, with real verified code commits, before pr
 - Latest screenshot/user feedback: no visible change despite previous commits. New mobile CSS FINAL OVERRIDE was committed to index.html at 42ea815b392773f3292ca50d1d86935864783ce5. It targets viewport <=900px and forces orange header and bottom dock, black buttons, canvas-first layout and contextual sheet visibility. UI version label changed to CANVAS v3.
 - **DO NOT claim live deployment is verified.** Next chat MUST inspect GitHub Pages deployment/served HTML and run real browser QA. A commit alone does not prove live rendering. Check CSS specificity, mobile computed styles, browser cache, and Pages workflow. If CANVAS v3 is not visible, investigate deployment before additional redesign.
 - User explicitly wants changes in GitHub, not images, and a new-chat prompt to resume without reexplaining.
+
+
+## 2026-11-21 QA continuation — property edit history
+- Confirmed Browser QA #35, commit 8b11b60d139b6beea597454295b861912541ed1b: 16/16 Playwright tests passed; GitHub Pages deployment succeeded.
+- Found an existing limitation: editing many element properties did not push pre-edit snapshots to undo history.
+- Added capture-phase input/change history recording in index.html for selected element property controls, preserving existing localStorage keys, styling and feature handlers. Commit 7e39fbfe0912a82e16ef66fafd235edfe350c567.
+- Added Playwright color property undo/redo regression; commit 66618417fdbeedca3a39b061e24ab893b64b406a.
+- IMPORTANT: check the newest GitHub Actions Browser QA run and logs before declaring 17/17 PASS. Real Samsung touch/keyboard testing, comprehensive breakpoint-specific overrides and full animation timeline remain pending.
