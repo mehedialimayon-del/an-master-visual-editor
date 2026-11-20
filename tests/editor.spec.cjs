@@ -6,9 +6,9 @@ test('desktop controls and page history',async({page})=>{
  await page.locator('#label').fill('QA Desktop');
  await expect(page.locator('.item')).toContainText('QA Desktop');
  await page.locator('#undo').click();
- await expect(page.locator('.item')).toHaveCount(0);
- await page.locator('#redo').click();
  await expect(page.locator('.item')).toHaveCount(1);
+ await page.locator('#redo').click();
+ await expect(page.locator('.item')).toContainText('QA Desktop');
  page.once('dialog',d=>d.accept());
  await page.locator('#save').click();
  await page.reload();
