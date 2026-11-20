@@ -117,3 +117,9 @@ User wants Steps 1–5 done together, with real verified code commits, before pr
 - Root cause: snapshot() read the already-changed device select value during onchange, rather than the previous canvas W/H dimensions. Fixed snapshot device capture to W+'x'+H in commit 6a81556b6ca59256e1fdbf2fceeac104eacb440d.
 - Strengthened regression to compare original element position after Undo, not a self-referential computed CSS assertion; test commit 9bffb21da4e409a04fd5bf24f7f1df42f18e6afa.
 - Latest CI and Pages deployment must be checked before claiming 26/26 PASS. Physical Samsung QA remains blocked.
+
+## 2026-11-21 Mobile deep QA and Node.js runtime warning
+- Baseline: 26/26 Playwright browser QA and Pages deployment successful at 15cbf1e7cf5ef679cb34a99a9dedb3fa1c088214.
+- Inspected .github/workflows/browser-qa.yml: Node.js application environment was already 22, but actions/checkout@v4 and actions/setup-node@v4 used Node.js 20 action runtime. Upgraded both actions to v5 (Node.js 24 runtime) while retaining node-version: 22. Commit d8449df30cf2d70e6ee499c5667743bb2c5d4853. Confirm warning resolution from new GitHub Actions logs before claiming fixed.
+- Added two simulated touch/mobile Playwright regressions for Samsung S23 Ultra (384x824) and A07 (360x800): keyboard text entry, contextual sheet navigation, save/reload persistence, dock geometry, and horizontal overflow. Commit d80d09909caea94795e4bd89a7df8ade6cebd1ac.
+- Expect 28 total browser tests, pending CI verification. Physical Samsung device testing, actual Android soft-keyboard behavior, and cross-browser QA are NOT verified. Preserve an-mve-v1 and an-mve-components-v1 storage and black/orange/white theme.
