@@ -298,3 +298,16 @@ test('mobile style panel controls remain discoverable by category',async({page})
  await page.getByRole('button',{name:'Animation',exact:true}).click();
  await expect(page.locator('#hotspotClick')).toBeVisible();
 });
+
+test('property editing supports undo and redo without losing stored element',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ await page.locator('#label').fill('Original');
+ await expect(page.locator('.item[data-type="text"]')).toContainText('Original');
+ await page.locator('#color').fill('#123456');
+ await expect(page.locator('.item[data-type="text"]')).toHaveCSS('color','rgb(18, 52, 86)');
+ await page.locator('#undo').click();
+ await expect(page.locator('.item[data-type="text"]')).not.toHaveCSS('color','rgb(18, 52, 86)');
+ await page.locator('#redo').click();
+ await expect(page.locator('.item[data-type="text"]')).toHaveCSS('color','rgb(18, 52, 86)');
+});
