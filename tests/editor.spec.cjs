@@ -235,3 +235,18 @@ test('mobile touch drag and resize persists after reload',async({browser})=>{
  expect(persisted.x).toBeGreaterThan(before.x+4);
  await context.close();
 });
+
+test('image upload replaces selected image and undo restores previous image',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ const first=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9WlT8lMAAAAASUVORK5CYII=','base64');
+ const second=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAX9R4bYAAAAASUVORK5CYII=','base64');
+ await page.locator('#image').setInputFiles({name:'first.png',mimeType:'image/png',buffer:first});
+ await expect(page.locator('.item[data-type="image"]')).toHaveCount(1);
+ const original=await page.locator('.item[data-type="image"] img').getAttribute('src');
+ await page.locator('#image').setInputFiles({name:'second.png',mimeType:'image/png',buffer:second});
+ await expect(page.locator('.item[data-type="image"]')).toHaveCount(1);
+ const replacement=await page.locator('.item[data-type="image"] img').getAttribute('src');
+ expect(replacement).not.toBe(original);
+ await page.locator('#undo').click();
+ await expect(page.locator('.item[data-type="image"] img')).toHaveAttribute('src',original);
+});
