@@ -274,7 +274,7 @@ test('style, component library, save reload, delete undo and export regression',
  await test.step('QA checkpoint 7: await page.reload();',async()=>{await page.reload();});
  await expect(page.locator('.item[data-type="button"]')).toHaveCount(2);
  await expect(page.locator('#components option')).toHaveCount(2);
- await test.step('QA checkpoint 8: await page.locator(.item[data-type="button"]).firs',async()=>{await page.locator('.item[data-type="button"]').first().click();});
+ await test.step('QA checkpoint 8: await page.locator(.item[data-type="button"]).firs',async()=>{await page.locator('.item[data-type="button"]').last().click();});
  await test.step('QA checkpoint 9: await page.locator(#delete).click();',async()=>{await page.locator('#delete').click();});
  await expect(page.locator('.item[data-type="button"]')).toHaveCount(1);
  await page.locator('#undo').click();
