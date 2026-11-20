@@ -53,7 +53,8 @@ test('mobile content deletion is confirmed and undo restores item',async({page})
  await page.locator('.mobile-dock [data-panel="text"]').click();
  await page.locator('.sheet-actions button').filter({hasText:'+ Text'}).click();
  await expect(page.locator('.item')).toHaveCount(1);
- await page.locator('.mobile-dock [data-panel="text"]').click();
+ // The Text sheet is already open: tapping its dock button again closes it.
+ await expect(page.locator('.tools')).toBeVisible();
  await expect(page.getByRole('button',{name:'Delete Selected Content'})).toBeVisible();
  page.once('dialog',dialog=>dialog.accept());
  await page.getByRole('button',{name:'Delete Selected Content'}).click();
