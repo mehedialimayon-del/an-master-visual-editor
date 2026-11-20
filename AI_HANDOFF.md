@@ -98,3 +98,9 @@ User wants Steps 1–5 done together, with real verified code commits, before pr
 - Browser QA run 44822884714: 20 passed, 1 failed. The failed test was custom responsive viewport persistence after reload; device selector received empty value instead of 412x915.
 - Root cause: ensureDeviceOption used a double-escaped digit regex literal and rejected valid custom dimensions. Fixed in index.html commit 48b54b171d1e943929d6f3220adee68d0d3aaa0d. Existing Playwright regression at tests/editor.spec.cjs checks 412x915 after reload.
 - Check subsequent Browser QA and Pages deployment before claiming 21/21 PASS. Physical Samsung QA and full keyframe/per-breakpoint overrides remain pending.
+
+## 2026-11-21 Two-point keyframe animation phase
+- Baseline: 21/21 browser QA and Pages deployment passed at 4f1ce3b813765df42d0fd220cd92aeb9a768622e.
+- Added optional per-element two-point opacity/translateY keyframes, edited in the existing Animation sheet, with Web Animations API playback and timeline scrub/pause/play integration. New values are stored on the element in the existing an-mve-v1 document; undo captures applying/removing keyframes. Code commit e652549aae143c6075562e12951a9cf8d4361e92.
+- Added Playwright regression for animation, save/reload and clearing at b40325dd64817b6e93fff21eee72e12e69621a20.
+- This is a two-point animation preview, not a complete multi-track keyframe editor. Independent per-breakpoint element position/style overrides and exported HTML keyframe parity are NOT implemented. Verify the newest QA and Pages deployment before claiming PASS; physical Samsung QA is blocked.
