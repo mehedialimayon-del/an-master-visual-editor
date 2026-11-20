@@ -50,7 +50,8 @@ test('canvas-first mobile interface shows dock and contextual tools',async({page
 test('mobile content deletion is confirmed and undo restores item',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('http://127.0.0.1:4173/');
- await page.locator('#text').click();
+ await page.locator('.mobile-dock [data-panel="text"]').click();
+ await page.locator('.sheet-actions button').filter({hasText:'+ Text'}).click();
  await expect(page.locator('.item')).toHaveCount(1);
  await page.locator('.mobile-dock [data-panel="text"]').click();
  await expect(page.getByRole('button',{name:'Delete Selected Content'})).toBeVisible();
