@@ -104,3 +104,10 @@ User wants Steps 1–5 done together, with real verified code commits, before pr
 - Added optional per-element two-point opacity/translateY keyframes, edited in the existing Animation sheet, with Web Animations API playback and timeline scrub/pause/play integration. New values are stored on the element in the existing an-mve-v1 document; undo captures applying/removing keyframes. Code commit e652549aae143c6075562e12951a9cf8d4361e92.
 - Added Playwright regression for animation, save/reload and clearing at b40325dd64817b6e93fff21eee72e12e69621a20.
 - This is a two-point animation preview, not a complete multi-track keyframe editor. Independent per-breakpoint element position/style overrides and exported HTML keyframe parity are NOT implemented. Verify the newest QA and Pages deployment before claiming PASS; physical Samsung QA is blocked.
+
+## 2026-11-21 Export keyframes and saved breakpoint layouts
+- Baseline: 22/22 Playwright browser QA and Pages deployment passed for commit 07aed78821f1b504744e946ec69101f4cda6534a.
+- Added CSS @keyframes generation for exported HTML text and button elements using their existing two-point keyframes; sanitized opacity and vertical translation numeric ranges, with reduced-motion override. Commits accfb70ec46346953756ae2f8b6573130a6eb613, f6cd8212c09546d4ae87e89c23e60a20ee6c5726.
+- Added explicit Save This Breakpoint Layout action and a breakpointLayouts map keyed by device dimension, persisted inside existing an-mve-v1 JSON and undo snapshots. When switching to a saved device layout, restore its element snapshots; otherwise preserve legacy proportional scaling. Commit 3d52272fd3cc9937b8a61bd774eba158139117e4.
+- Added export CSS and breakpoint save/reload Playwright regressions in commit 4635e8c52d66737f3d2b2151ed39c2a9906018a2. Check newest CI logs and Pages deployment before claiming 24/24 PASS.
+- LIMITATIONS: breakpoint layouts are explicit snapshots, not automatic per-property responsive rules. Switching devices without saving may still scale current layout. Keyframe export parity for complex effects, all devices, and physical Samsung QA remain unverified.
