@@ -554,3 +554,15 @@ test('Stage 8 cloud project save uses authenticated RPC and keeps existing local
  await page.locator('#cloudProjects').click();
  await expect(page.locator('.item')).toHaveCount(1);
 });
+
+test('Stage 9 SEO metadata exports safely with robots controls',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ page.on('dialog',async d=>{if(d.type()==='prompt')await d.accept(d.message().includes('title')?'My Test Site': 'A sample description');else await d.dismiss()});
+ await page.locator('#seoSettings').click();
+ const download=page.waitForEvent('download');
+ await page.locator('#export').click();
+ const html=require('fs').readFileSync(await (await download).path(),'utf8');
+ expect(html).toContain('<title>My Test Site</title>');
+ expect(html).toContain('name="description"');
+ expect(html).toContain('name="robots" content="noindex,nofollow"');
+});
