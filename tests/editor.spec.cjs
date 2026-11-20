@@ -88,3 +88,27 @@ test('manual hotspot settings, save reload and export',async({page})=>{
  expect(html).toContain('an-hotspot');
  expect(html).toContain('https://example.com');
 });
+
+test('hotspot selection, drag resize, delete and undo regression',async({page})=>{
+ test.setTimeout(45000);
+ page.on('dialog',d=>d.accept());
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('.mobile-dock [data-panel="button"]').click();
+ await page.locator('.sheet-actions button').filter({hasText:'+ Select Hotspot Area'}).click();
+ const item=page.locator('.item[data-type="hotspot"]');
+ await expect(item).toHaveCount(1);
+ await page.locator('#closeSheet').click();
+ const rect=await item.boundingBox();
+ await page.mouse.move(rect.x+rect.width/2,rect.y+rect.height/2);
+ await page.mouse.down();
+ await page.mouse.move(rect.x+rect.width/2+20,rect.y+rect.height/2+15,{steps:4});
+ await page.mouse.up();
+ await expect(item).toHaveCount(1);
+ await item.click();
+ await expect(page.locator('#sheetTitle')).toHaveText('Button Editing');
+ await page.getByRole('button',{name:'Delete Selected Content'}).click();
+ await expect(item).toHaveCount(0);
+ await page.locator('#undo').click();
+ await expect(page.locator('.item[data-type="hotspot"]')).toHaveCount(1);
+});
