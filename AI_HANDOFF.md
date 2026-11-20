@@ -111,3 +111,9 @@ User wants Steps 1–5 done together, with real verified code commits, before pr
 - Added explicit Save This Breakpoint Layout action and a breakpointLayouts map keyed by device dimension, persisted inside existing an-mve-v1 JSON and undo snapshots. When switching to a saved device layout, restore its element snapshots; otherwise preserve legacy proportional scaling. Commit 3d52272fd3cc9937b8a61bd774eba158139117e4.
 - Added export CSS and breakpoint save/reload Playwright regressions in commit 4635e8c52d66737f3d2b2151ed39c2a9906018a2. Check newest CI logs and Pages deployment before claiming 24/24 PASS.
 - LIMITATIONS: breakpoint layouts are explicit snapshots, not automatic per-property responsive rules. Switching devices without saving may still scale current layout. Keyframe export parity for complex effects, all devices, and physical Samsung QA remain unverified.
+
+## 2026-11-21 Deep regression: breakpoint Undo fix
+- Browser QA run 44824519359 failed: 25/26 passed. Breakpoint switch 390x640 to 768x1024 then Undo retained 768x1024 in device dropdown. Exported standalone keyframe playback test passed.
+- Root cause: snapshot() read the already-changed device select value during onchange, rather than the previous canvas W/H dimensions. Fixed snapshot device capture to W+'x'+H in commit 6a81556b6ca59256e1fdbf2fceeac104eacb440d.
+- Strengthened regression to compare original element position after Undo, not a self-referential computed CSS assertion; test commit 9bffb21da4e409a04fd5bf24f7f1df42f18e6afa.
+- Latest CI and Pages deployment must be checked before claiming 26/26 PASS. Physical Samsung QA remains blocked.
