@@ -469,3 +469,26 @@ for(const device of [{name:'S23 Ultra',width:384,height:824},{name:'A07',width:3
   await context.close();
  });
 }
+
+
+test('Stage 5 cancelled page operations do not pollute undo history',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ page.once('dialog',d=>d.dismiss());
+ await page.locator('#newPage').click();
+ await page.locator('#undo').click();
+ await expect(page.locator('.item[data-type="text"]')).toHaveCount(0);
+ await expect(page.locator('#page option')).toHaveCount(1);
+});
+
+test('Stage 5 cancelling deletion keeps page and undo history intact',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ page.once('dialog',d=>d.accept('Second'));
+ await page.locator('#newPage').click();
+ await expect(page.locator('#page option')).toHaveCount(2);
+ page.once('dialog',d=>d.dismiss());
+ await page.locator('#deletePage').click();
+ await expect(page.locator('#page option')).toHaveCount(2);
+ await page.locator('#undo').click();
+ await expect(page.locator('#page option')).toHaveCount(1);
+});
