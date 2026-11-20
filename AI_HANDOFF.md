@@ -9,7 +9,7 @@ The user wants actual GitHub website changes, NOT generated pictures. The suppli
 - Live GitHub Pages: https://mehedialimayon-del.github.io/an-master-visual-editor/
 - Branch: main. Primary source: index.html (single-file HTML/CSS/JS).
 - README.md includes the 10-stage roadmap. Browser QA workflow: .github/workflows/browser-qa.yml; tests: tests/editor.spec.cjs.
-- Latest UI commit at writing: bd84a6d6accb0fa8c25e30c6fbd769b7842a8b85. Always FETCH main to get latest SHA, never assume it stays unchanged.
+- Latest UI fix at writing: 42ea815b392773f3292ca50d1d86935864783ce5 (CANVAS v3). Always FETCH main to get latest SHA, never assume it stays unchanged.
 - The app is NOT confirmed to use Supabase; do not invent a schema or modify any database without evidence.
 
 ## Current UI / architecture
@@ -64,3 +64,8 @@ User wants Steps 1–5 done together, with real verified code commits, before pr
 4. Run syntax plus browser automated tests, inspect GitHub Actions logs; perform Android QA only if a real Android browser/device is available, otherwise clearly mark blocked.
 5. Commit verified changes and give commit SHA, tested flows, failed/blocked items, and live link. Do not claim all PASS from syntax alone.
 6. Do not ask user to restate this history or create images.
+
+## 2026-11-21 follow-up: user reports changes not appearing
+- Latest screenshot/user feedback: no visible change despite previous commits. New mobile CSS FINAL OVERRIDE was committed to index.html at 42ea815b392773f3292ca50d1d86935864783ce5. It targets viewport <=900px and forces orange header and bottom dock, black buttons, canvas-first layout and contextual sheet visibility. UI version label changed to CANVAS v3.
+- **DO NOT claim live deployment is verified.** Next chat MUST inspect GitHub Pages deployment/served HTML and run real browser QA. A commit alone does not prove live rendering. Check CSS specificity, mobile computed styles, browser cache, and Pages workflow. If CANVAS v3 is not visible, investigate deployment before additional redesign.
+- User explicitly wants changes in GitHub, not images, and a new-chat prompt to resume without reexplaining.
