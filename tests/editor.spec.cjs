@@ -492,3 +492,33 @@ test('Stage 5 cancelling deletion keeps page and undo history intact',async({pag
  await page.locator('#undo').click();
  await expect(page.locator('#page option')).toHaveCount(1);
 });
+
+test('Stage 7 real shapes render and export',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ page.once('dialog',d=>d.accept('ellipse'));
+ await page.locator('#ribbonShape').click();
+ await expect(page.locator('.item[data-type="shape"]')).toHaveCount(1);
+ const promise=page.waitForEvent('download');
+ await page.locator('#export').click();
+ const html=require('fs').readFileSync(await (await promise).path(),'utf8');
+ expect(html).toContain('border-radius:50%');
+});
+test('Stage 7 editable tables persist after save and reload',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ page.on('dialog',async d=>d.accept(d.message().includes('rows')?'2':d.message().includes('columns')?'2':d.message().includes('Row (')?'1':d.message().includes('Column (')?'1':'Updated cell'));
+ await page.locator('#ribbonTable').click();
+ await expect(page.locator('.item[data-type="table"] .design-table td')).toHaveCount(4);
+ await page.locator('#ribbonEditTable').click();
+ await expect(page.locator('.item[data-type="table"]')).toContainText('Updated cell');
+ await page.locator('#save').click();
+ await page.reload();
+ await expect(page.locator('.item[data-type="table"]')).toContainText('Updated cell');
+});
+test('Stage 7 local assistant inserts reusable design without external calls',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#ribbonAI').click();
+ await expect(page.locator('#designAssistant')).toHaveClass(/open/);
+ await page.locator('#assistantGoal').selectOption('cta');
+ await page.locator('#assistantInsert').click();
+ await expect(page.locator('.item[data-type="button"]')).toContainText('Get Started');
+});
