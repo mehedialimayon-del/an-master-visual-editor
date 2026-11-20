@@ -77,3 +77,12 @@ User wants Steps 1–5 done together, with real verified code commits, before pr
 - Added capture-phase input/change history recording in index.html for selected element property controls, preserving existing localStorage keys, styling and feature handlers. Commit 7e39fbfe0912a82e16ef66fafd235edfe350c567.
 - Added Playwright color property undo/redo regression; commit 66618417fdbeedca3a39b061e24ab893b64b406a.
 - IMPORTANT: check the newest GitHub Actions Browser QA run and logs before declaring 17/17 PASS. Real Samsung touch/keyboard testing, comprehensive breakpoint-specific overrides and full animation timeline remain pending.
+
+
+## 2026-11-21 Multi-element template implementation
+- Starting baseline: 18/18 browser QA passed at 35fb0833c9bb5c8ce05053e0e4ba809bebc73077, with Pages deployment success.
+- Added Save Page Template action to persist all elements from the current page as one reusable template in existing an-mve-components-v1 storage. Existing single-element entries remain readable and insertable.
+- Inserting a template clones all elements with new IDs and an offset, and records one Undo snapshot for the whole insertion.
+- Exposed action in mobile Pages > Components contextual sheet. Commits: 8164131b55d107f5e92361ddcde040d674bc2ffa and db6090e5b403b4dd819a9762af3cbbc7fbe7f8d6.
+- Added Playwright regression for save/reload/insert/undo of two-element templates at b94d0817d0a8eaf58e386cef00827834b3065432.
+- New browser QA and Pages deployment MUST be checked before claiming PASS. Advanced animation timeline, independent responsive breakpoint editor and physical Samsung device QA remain pending.
