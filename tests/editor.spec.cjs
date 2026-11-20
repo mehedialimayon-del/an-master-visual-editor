@@ -385,3 +385,27 @@ test('two-point keyframes persist and can be undone',async({page})=>{
  await page.locator('#clearKeyframes').click();
  await expect(page.locator('.item[data-type="text"] .content')).toHaveCount(1);
 });
+
+test('exported HTML contains custom keyframe CSS for text and buttons',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ await page.locator('#applyKeyframes').click();
+ const downloadPromise=page.waitForEvent('download');
+ await page.locator('#export').click();
+ const file=await downloadPromise;
+ const html=require('fs').readFileSync(await file.path(),'utf8');
+ expect(html).toContain('@keyframes anCustomKeyframe');
+ expect(html).toContain('animation:anCustomKeyframe');
+});
+test('saved breakpoint layout restores independently after device switch and reload',async({page})=>{
+ page.on('dialog',d=>d.accept());
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ await page.locator('#saveBreakpointLayout').click();
+ await page.locator('#device').selectOption('768x1024');
+ await page.locator('#save').click();
+ await page.reload();
+ await page.locator('#device').selectOption('390x640');
+ await expect(page.locator('.item[data-type="text"]')).toHaveCount(1);
+ await expect(page.locator('#device')).toHaveValue('390x640');
+});
