@@ -419,7 +419,7 @@ test('breakpoint saved positions survive switch reload and undo redo',async({pag
  await page.locator('#device').selectOption('768x1024');
  await page.locator('#undo').click();
  await expect(page.locator('#device')).toHaveValue('390x640');
- await expect(page.locator('.item[data-type="text"]')).toHaveCSS('left',await page.locator('.item[data-type="text"]').evaluate(e=>getComputedStyle(e).left));
+ expect(await page.locator('.item[data-type="text"]').evaluate(e=>e.style.left)).toBe(original);
  await page.locator('#redo').click();
  await expect(page.locator('#device')).toHaveValue('768x1024');
  await page.locator('#save').click();
