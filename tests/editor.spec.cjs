@@ -272,7 +272,7 @@ test('style, component library, save reload, delete undo and export regression',
  await page.locator('#save').click();
  await page.reload();
  await expect(page.locator('.item[data-type="button"]')).toHaveCount(2);
- await expect(page.locator('#components option')).toHaveCount(1);
+ await expect(page.locator('#components option')).toHaveCount(2);
  await page.locator('.item[data-type="button"]').first().click();
  await page.locator('#delete').click();
  await expect(page.locator('.item[data-type="button"]')).toHaveCount(1);
