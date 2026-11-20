@@ -251,3 +251,48 @@ test('image upload replaces selected image and undo restores previous image',asy
  await page.locator('#undo').click();
  await expect(page.locator('.item[data-type="image"] img')).toHaveAttribute('src',original);
 });
+
+test('style, component library, save reload, delete undo and export regression',async({page})=>{
+ test.setTimeout(45000);
+ page.on('dialog',d=>d.accept('Reusable QA Component'));
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#button').click();
+ await expect(page.locator('.item[data-type="button"]')).toHaveCount(1);
+ await page.locator('#label').fill('QA Action');
+ await page.locator('#color').fill('#ffffff');
+ await page.locator('#saveComponent').click();
+ await expect(page.locator('#components option')).toHaveCount(1);
+ await page.locator('#insertComponent').click();
+ await expect(page.locator('.item[data-type="button"]')).toHaveCount(2);
+ await page.locator('#undo').click();
+ await expect(page.locator('.item[data-type="button"]')).toHaveCount(1);
+ await page.locator('#redo').click();
+ await expect(page.locator('.item[data-type="button"]')).toHaveCount(2);
+ await page.locator('#save').click();
+ await page.reload();
+ await expect(page.locator('.item[data-type="button"]')).toHaveCount(2);
+ await expect(page.locator('#components option')).toHaveCount(1);
+ await page.locator('.item[data-type="button"]').first().click();
+ await page.locator('#delete').click();
+ await expect(page.locator('.item[data-type="button"]')).toHaveCount(1);
+ await page.locator('#undo').click();
+ await expect(page.locator('.item[data-type="button"]')).toHaveCount(2);
+ const downloadPromise=page.waitForEvent('download');
+ await page.locator('#export').click();
+ const download=await downloadPromise;
+ const html=require('fs').readFileSync(await download.path(),'utf8');
+ expect(html).toContain('QA Action');
+});
+test('mobile style panel controls remain discoverable by category',async({page})=>{
+ await page.setViewportSize({width:384,height:824});
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('.mobile-dock [data-panel="button"]').click();
+ await expect(page.getByRole('button',{name:'Content',exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Style',exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Animation',exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Layout',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Style',exact:true}).click();
+ await expect(page.locator('#hotspotGlow')).toBeVisible();
+ await page.getByRole('button',{name:'Animation',exact:true}).click();
+ await expect(page.locator('#hotspotClick')).toBeVisible();
+});
