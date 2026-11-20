@@ -324,3 +324,23 @@ test('minimum opacity persists and reduced motion disables canvas animation',asy
  await page.reload();
  await expect(page.locator('.item[data-type="text"]')).toHaveCSS('opacity','0.1');
 });
+
+test('multi-element page template saves and inserts both elements after reload',async({page})=>{
+ page.on('dialog',d=>d.accept('QA Page Template'));
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ await page.locator('#label').fill('Template heading');
+ await page.locator('#button').click();
+ await page.locator('#label').fill('Template action');
+ await page.locator('#savePageTemplate').click();
+ await expect(page.locator('#components option')).toHaveCount(2);
+ await page.locator('#save').click();
+ await page.reload();
+ await page.locator('#components').selectOption('0');
+ await page.locator('#insertComponent').click();
+ await expect(page.locator('.item[data-type="text"]')).toHaveCount(2);
+ await expect(page.locator('.item[data-type="button"]')).toHaveCount(2);
+ await page.locator('#undo').click();
+ await expect(page.locator('.item[data-type="text"]')).toHaveCount(1);
+ await expect(page.locator('.item[data-type="button"]')).toHaveCount(1);
+});
