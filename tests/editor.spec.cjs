@@ -537,3 +537,20 @@ test('Stage 8 form builder persists and exports working submission handler',asyn
  expect(html).toContain('data-an-form');
  expect(html).toContain('form-submission.json');
 });
+
+test('Stage 8 cloud project save uses authenticated RPC and keeps existing local editor',async({page})=>{
+ await page.route('https://ztedjqdilkealvnjwivd.supabase.co/**',async route=>{
+  const url=route.request().url();
+  if(url.includes('/auth/v1/token'))return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({access_token:'qa-token'})});
+  if(url.includes('an_mve_save_project'))return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify('11111111-1111-4111-8111-111111111111')});
+  return route.fulfill({status:404,contentType:'application/json',body:'{}'});
+ });
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ page.on('dialog',async d=>{
+  if(d.type()==='prompt'){const msg=d.message();await d.accept(msg.includes('email')?'qa@example.com':msg.includes('password')?'test-password':'save')}
+  else await d.accept();
+ });
+ await page.locator('#cloudProjects').click();
+ await expect(page.locator('.item')).toHaveCount(1);
+});
