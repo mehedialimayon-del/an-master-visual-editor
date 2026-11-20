@@ -17,21 +17,23 @@ test('desktop controls and page history',async({page})=>{
  await page.locator('#newPage').click();
  await page.locator('#page').selectOption('0');
 });
-test('mobile layout, component and export',async({page})=>{
+test('mobile contextual editor, component and export',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('http://127.0.0.1:4173/');
- await page.locator('#text').click();
- page.once('dialog',d=>d.accept('Saved Text'));
- await page.locator('#saveComponent').click();
- await page.locator('#components').selectOption('0');
- await page.locator('#insertComponent').click();
- await expect(page.locator('.item')).toHaveCount(2);
+ await page.locator('.mobile-dock [data-panel="text"]').click();
+ await expect(page.locator('.tools')).toBeVisible();
+ await page.locator('#closeSheet').click();
+ await page.locator('.mobile-dock [data-panel="page"]').click();
+ await page.getByRole('button',{name:'Components',exact:true}).click();
+ await expect(page.locator('.sheet-tabs button.active')).toHaveText('Components');
+ await page.locator('#closeSheet').click();
+ await page.locator('.mobile-dock [data-panel="screen"]').click();
+ await page.getByRole('button',{name:'Export',exact:true}).click();
  const downloadPromise=page.waitForEvent('download');
- await page.locator('#export').click();
+ await page.locator('.sheet-actions button').filter({hasText:'Export HTML'}).click();
  const download=await downloadPromise;
  expect(download.suggestedFilename()).toBe('visual-site.html');
 });
-
 test('canvas-first mobile interface shows dock and contextual tools',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('http://127.0.0.1:4173/');
