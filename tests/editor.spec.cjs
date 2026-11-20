@@ -566,3 +566,19 @@ test('Stage 9 SEO metadata exports safely with robots controls',async({page})=>{
  expect(html).toContain('name="description"');
  expect(html).toContain('name="robots" content="noindex,nofollow"');
 });
+
+test('Stage 9 SEO persists after reload and export is complete HTML',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ page.on('dialog',async d=>{if(d.type()==='prompt')await d.accept(d.message().includes('title')?'Persistent Site':'Persistent description');else if(d.message().includes('index'))await d.dismiss();else await d.accept()});
+ await page.locator('#seoSettings').click();
+ await page.reload();
+ const download=page.waitForEvent('download');
+ await page.locator('#export').click();
+ const html=require('fs').readFileSync(await (await download).path(),'utf8');
+ expect(html).toContain('<title>Persistent Site</title>');
+ expect(html).toContain('Persistent description');
+ expect(html).toContain('<body>');
+ expect(html).toContain('</body></html>');
+ expect(html).toContain('noindex,nofollow');
+ await expect(page.locator('#publishGuide')).toBeVisible();
+});
