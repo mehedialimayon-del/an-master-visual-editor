@@ -68,3 +68,20 @@ test('built-in and custom website preview in canvas with safe return', async ({ 
   await expect(page.locator('#websiteCanvasPreview iframe')).toHaveAttribute('src', 'https://custom.example.test/');
   await page.getByRole('button', { name: 'Return to Editor' }).click();
 });
+
+test('responsive website preview changes real iframe viewport width', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.getByRole('button', { name: 'Preview MA Tour & Travels in Canvas' }).click();
+  const select = page.getByRole('combobox', { name: 'Website preview screen size' });
+  const iframe = page.locator('#websiteCanvasPreview iframe');
+  await expect(select).toHaveValue('390');
+  await expect(iframe).toHaveCSS('width', '390px');
+  await select.selectOption('1366');
+  await expect(iframe).toHaveCSS('width', '1366px');
+  await expect(iframe).toHaveCSS('transform', /matrix\\(/);
+  await select.selectOption('430');
+  await expect(iframe).toHaveCSS('width', '430px');
+  await page.getByRole('button', { name: 'Return to Editor' }).click();
+  await expect(page.locator('#websiteCanvasPreview')).toHaveCount(0);
+});
