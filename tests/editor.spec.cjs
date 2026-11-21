@@ -599,3 +599,25 @@ test('Stage 9 SEO persists after reload and export is complete HTML',async({page
  expect(html).toContain('noindex,nofollow');
  await expect(page.locator('#publishGuide')).toBeVisible();
 });
+
+test('Stage 10 export is keyboard accessible and produces downloadable HTML',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#export').focus();
+ const download=page.waitForEvent('download');
+ await page.keyboard.press('Enter');
+ const file=await download;
+ const html=require('fs').readFileSync(await file.path(),'utf8');
+ expect(html).toContain('<!doctype html>');
+ expect(html).toContain('</body></html>');
+});
+
+test('Stage 10 cloud login password is masked and cancel preserves local editor',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ page.on('dialog',async d=>{if(d.type()==='prompt')await d.accept('qa@example.com');else await d.accept()});
+ await page.locator('#text').click();
+ await page.locator('#cloudProjects').click();
+ await expect(page.locator('#mveCloudPassword')).toHaveAttribute('type','password');
+ await page.locator('#mveCloudLoginOverlay button[type="button"]').click();
+ await expect(page.locator('#mveCloudLoginOverlay')).toHaveCount(0);
+ await expect(page.locator('.item[data-type="text"]')).toHaveCount(1);
+});
