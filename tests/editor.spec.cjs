@@ -159,8 +159,11 @@ test('export retains text URL and page navigation',async({page,context})=>{
  await page.locator('#url').fill('https://example.com/text');
  await page.locator('#newPage').click();
  await page.locator('#page').selectOption('0');
- const downloadPromise=page.waitForEvent('download');
+ const diag=await page.evaluate(()=>{const a=document.querySelector('#export');const old=a.onclick;let error='';a.onclick=function(e){try{return old.call(this,e)}catch(err){error=err.stack||String(err)}};window.__exportDiagnostic=()=>error;return !!old});
+ const downloadPromise=page.waitForEvent('download',{timeout:3000}).catch(()=>null);
  await page.locator('#export').click();
+ const observed=await downloadPromise;
+ if(!observed)throw Error('Export did not download; handler='+diag+'; error='+await page.evaluate(()=>window.__exportDiagnostic()));
  const download=await downloadPromise;
  const html=require('fs').readFileSync(await download.path(),'utf8');
  const exported=await context.newPage();
@@ -393,7 +396,7 @@ test('exported HTML contains custom keyframe CSS for text and buttons',async({pa
  await page.locator('#applyKeyframes').click();
  const downloadPromise=page.waitForEvent('download');
  await page.locator('#export').click();
- const file=await downloadPromise;
+ const file=observed;
  const html=require('fs').readFileSync(await file.path(),'utf8');
  expect(html).toContain('@keyframes anCustomKeyframe');
  expect(html).toContain('animation:anCustomKeyframe');
@@ -433,9 +436,12 @@ test('exported keyframe animation actually plays in standalone HTML',async({page
  await page.goto('http://127.0.0.1:4173/');
  await page.locator('#text').click();
  await page.locator('#applyKeyframes').click();
- const promise=page.waitForEvent('download');
+ await page.evaluate(()=>{const a=document.querySelector('#export');const old=a.onclick;a.onclick=function(e){try{return old.call(this,e)}catch(err){window.__exportError=err.stack||String(err)}}});
+ const promise=page.waitForEvent('download',{timeout:3000}).catch(()=>null);
  await page.locator('#export').click();
- const download=await promise;
+ const observed=await promise;
+ if(!observed)throw Error('Export failed: '+await page.evaluate(()=>window.__exportError));
+ const download=observed;
  const html=require('fs').readFileSync(await download.path(),'utf8');
  const exported=await browser.newPage();
  await exported.goto('http://127.0.0.1:4173/');
