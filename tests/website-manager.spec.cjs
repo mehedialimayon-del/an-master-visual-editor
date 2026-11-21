@@ -79,7 +79,7 @@ test('responsive website preview changes real iframe viewport width', async ({ p
   await expect(iframe).toHaveCSS('width', '390px');
   await select.selectOption('1366');
   await expect(iframe).toHaveCSS('width', '1366px');
-  await expect(iframe).toHaveCSS('transform', /matrix\\(/);
+  await expect(iframe).toHaveCSS('transform', /^matrix\\(/);
   await select.selectOption('430');
   await expect(iframe).toHaveCSS('width', '430px');
   await page.getByRole('button', { name: 'Return to Editor' }).click();
