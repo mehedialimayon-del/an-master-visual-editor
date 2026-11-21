@@ -387,7 +387,7 @@ test('two-point keyframes persist and can be undone',async({page})=>{
 });
 
 test('exported HTML contains custom keyframe CSS for text and buttons',async({page})=>{
- page.on('pageerror',error=>console.log('EXPORT_PAGE_ERROR:',error.message));
+ page.on('pageerror',error=>console.log('EXPORT_PAGE_ERROR:',error.message));page.on('dialog',async d=>{console.log('EXPORT_DIALOG:',d.message());await d.dismiss()});
  await page.goto('http://127.0.0.1:4173/');
  await page.locator('#text').click();
  await page.locator('#applyKeyframes').click();
@@ -429,7 +429,7 @@ test('breakpoint saved positions survive switch reload and undo redo',async({pag
  expect(await page.locator('.item[data-type="text"]').evaluate(e=>e.style.left)).toBe(original);
 });
 test('exported keyframe animation actually plays in standalone HTML',async({page,browser})=>{
- page.on('pageerror',error=>console.log('EXPORT_PAGE_ERROR:',error.message));
+ page.on('pageerror',error=>console.log('EXPORT_PAGE_ERROR:',error.message));page.on('dialog',async d=>{console.log('EXPORT_DIALOG:',d.message());await d.dismiss()});
  await page.goto('http://127.0.0.1:4173/');
  await page.locator('#text').click();
  await page.locator('#applyKeyframes').click();
