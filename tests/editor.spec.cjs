@@ -621,3 +621,33 @@ test('Stage 10 cloud login password is masked and cancel preserves local editor'
  await expect(page.locator('#mveCloudLoginOverlay')).toHaveCount(0);
  await expect(page.locator('.item[data-type="text"]')).toHaveCount(1);
 });
+
+test('Stage 10 mobile keyboard export and editor state persist at narrow viewport',async({page})=>{
+ await page.setViewportSize({width:360,height:800});
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ await page.locator('#label').fill('Mobile deep QA');
+ await page.locator('#save').click();
+ await page.reload();
+ await expect(page.locator('.item[data-type="text"]')).toContainText('Mobile deep QA');
+ await page.locator('#export').focus();
+ const download=page.waitForEvent('download');
+ await page.keyboard.press('Enter');
+ const html=require('fs').readFileSync(await (await download).path(),'utf8');
+ expect(html).toContain('Mobile deep QA');
+});
+test('Stage 10 exported keyframe honors reduced motion preference',async({page,browser})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ await page.locator('#applyKeyframes').click();
+ const download=page.waitForEvent('download');
+ await page.locator('#export').click();
+ const html=require('fs').readFileSync(await (await download).path(),'utf8');
+ const exported=await browser.newPage({reducedMotion:'reduce'});
+ await exported.goto('http://127.0.0.1:4173/');
+ await exported.setContent(html);
+ const animated=exported.locator('[style*="anCustomKeyframe"]').first();
+ await expect(animated).toHaveCount(1);
+ await expect(animated).toHaveCSS('animation-name','none');
+ await exported.close();
+});
