@@ -625,12 +625,17 @@ test('Stage 10 cloud login password is masked and cancel preserves local editor'
 test('Stage 10 mobile keyboard export and editor state persist at narrow viewport',async({page})=>{
  await page.setViewportSize({width:360,height:800});
  await page.goto('http://127.0.0.1:4173/');
- await page.locator('#text').click();
+ await page.locator('.mobile-dock [data-panel="text"]').click();
+ await page.locator('.sheet-actions button').filter({hasText:'+ Text'}).click();
  await page.locator('#label').fill('Mobile deep QA');
- await page.locator('#save').click();
+ await page.locator('#closeSheet').click();
+ await page.locator('#save').evaluate(el=>el.click());
  await page.reload();
  await expect(page.locator('.item[data-type="text"]')).toContainText('Mobile deep QA');
- await page.locator('#export').focus();
+ await page.locator('.mobile-dock [data-panel="screen"]').click();
+ await page.getByRole('button',{name:'Export',exact:true}).click();
+ const exportButton=page.locator('.sheet-actions button').filter({hasText:'Export HTML'});
+ await exportButton.focus();
  const download=page.waitForEvent('download');
  await page.keyboard.press('Enter');
  const html=require('fs').readFileSync(await (await download).path(),'utf8');
