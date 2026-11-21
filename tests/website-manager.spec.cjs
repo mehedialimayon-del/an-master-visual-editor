@@ -75,11 +75,12 @@ test('responsive website preview changes real iframe viewport width', async ({ p
   await page.getByRole('button', { name: 'Preview MA Tour & Travels in Canvas' }).click();
   const select = page.getByRole('combobox', { name: 'Website preview screen size' });
   const iframe = page.locator('#websiteCanvasPreview iframe');
-  await expect(select).toHaveValue('390');
-  await expect(iframe).toHaveCSS('width', '390px');
+  await expect(select).toHaveValue('430');
+  await expect(iframe).toHaveCSS('width', '430px');
   await select.selectOption('1366');
   await expect(iframe).toHaveCSS('width', '1366px');
-  await expect(iframe).not.toHaveCSS('transform', 'none');
+  await expect(iframe).toHaveCSS('transform', 'none');
+  await expect(page.locator('#websiteCanvasPreview')).toHaveCSS('position', 'fixed');
   await select.selectOption('430');
   await expect(iframe).toHaveCSS('width', '430px');
   await page.getByRole('button', { name: 'Return to Editor' }).click();
