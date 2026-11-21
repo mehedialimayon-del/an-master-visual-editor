@@ -85,3 +85,14 @@ test('responsive website preview changes real iframe viewport width', async ({ p
   await page.getByRole('button', { name: 'Return to Editor' }).click();
   await expect(page.locator('#websiteCanvasPreview')).toHaveCount(0);
 });
+
+test('preview offers original GitHub source without modifying the live website', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.getByRole('button', { name: 'Preview Field Force Hub in Canvas' }).click();
+  const source = page.getByRole('link', { name: 'Open Field Force Hub GitHub source' });
+  await expect(source).toHaveAttribute('href', 'https://github.com/mehedialimayon-del/salesman-performance-app');
+  await expect(source).toHaveAttribute('target', '_blank');
+  await expect(source).toHaveAttribute('rel', /noopener/);
+  await expect(page.locator('#websiteCanvasPreview iframe')).toHaveAttribute('src', /salesman-performance-app/);
+});
