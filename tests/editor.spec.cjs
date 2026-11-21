@@ -564,6 +564,10 @@ test('Stage 8 cloud project save uses authenticated RPC and keeps existing local
  });
  await page.locator('#text').click();
  await page.locator('#cloudProjects').click();
+ const passwordField=page.locator('#mveCloudPassword');
+ await expect(passwordField).toHaveAttribute('type','password');
+ await passwordField.fill('test-password');
+ await page.locator('#mveCloudLoginOverlay button[type="submit"]').click();
  await completed;
  await expect(page.locator('.item')).toHaveCount(1);
 });
