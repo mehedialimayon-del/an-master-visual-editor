@@ -658,3 +658,23 @@ test('Stage 10 exported keyframe honors reduced motion preference',async({page,b
  await expect(animated).toHaveCSS('animation-name','none');
  await exported.close();
 });
+
+test('Stage 10 expired cloud token refreshes once and retries save without losing local items',async({page})=>{
+ let saves=0,refreshes=0;
+ await page.route('https://ztedjqdilkealvnjwivd.supabase.co/**',async route=>{
+  const url=route.request().url();
+  if(url.includes('/auth/v1/token?grant_type=password'))return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({access_token:'old-token',refresh_token:'refresh-secret'})});
+  if(url.includes('/auth/v1/token?grant_type=refresh_token')){refreshes++;return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({access_token:'new-token',refresh_token:'rotated-secret'})})}
+  if(url.includes('/rest/v1/rpc/an_mve_save_project')){saves++;if(route.request().headers().authorization==='Bearer old-token')return route.fulfill({status:401,contentType:'application/json',body:JSON.stringify({message:'JWT expired'})});return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify('11111111-1111-4111-8111-111111111111')})}
+  return route.fulfill({status:404,contentType:'application/json',body:'{}'});
+ });
+ await page.goto('http://127.0.0.1:4173/');
+ page.on('dialog',async d=>{if(d.type()==='prompt')await d.accept(d.message().includes('email')?'qa@example.com':'save');else await d.accept()});
+ await page.locator('#text').click();
+ await page.locator('#cloudProjects').click();
+ await page.locator('#mveCloudPassword').fill('mock-password');
+ await page.locator('#mveCloudLoginOverlay button[type="submit"]').click();
+ await expect.poll(()=>saves).toBe(2);
+ expect(refreshes).toBe(1);
+ await expect(page.locator('.item[data-type="text"]')).toHaveCount(1);
+});
