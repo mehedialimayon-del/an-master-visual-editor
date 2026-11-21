@@ -645,9 +645,11 @@ test('Stage 10 exported keyframe honors reduced motion preference',async({page,b
  await page.goto('http://127.0.0.1:4173/');
  await page.locator('#text').click();
  await page.locator('#applyKeyframes').click();
- const download=page.waitForEvent('download');
- await page.locator('#export').click();
- const html=require('fs').readFileSync(await (await download).path(),'utf8');
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const download=page.waitForEvent('download',{timeout:10000});
+ await page.locator('#export').evaluate(el=>el.click());
+ const file=await download.catch(e=>{throw new Error('Export download missing; page errors: '+errors.join(' | ')+'; '+e.message)});
+ const html=require('fs').readFileSync(await file.path(),'utf8');
  const exported=await browser.newPage({reducedMotion:'reduce'});
  await exported.goto('http://127.0.0.1:4173/');
  await exported.setContent(html);
