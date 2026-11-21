@@ -2,7 +2,7 @@ name: Visual Editor Android APK ZIP
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/android-apk-zip.yml']
+    paths: ['.github/workflows/android-apk-zip.yml', 'index.html', 'assets/**']
   workflow_dispatch:
 permissions:
   contents: read
@@ -26,6 +26,9 @@ jobs:
         run: |
           mkdir -p android-wrapper/app/src/main/assets android-wrapper/app/src/main/java/com/an/visualeditor
           cp index.html android-wrapper/app/src/main/assets/index.html
+          mkdir -p android-wrapper/app/src/main/assets/assets android-wrapper/app/src/main/res/drawable-nodpi
+          cp assets/an-visual-editor-icon.jpg android-wrapper/app/src/main/assets/assets/an-visual-editor-icon.jpg
+          cp assets/an-visual-editor-icon.jpg android-wrapper/app/src/main/res/drawable-nodpi/an_icon.jpg
           cat > android-wrapper/settings.gradle <<'EOF'
           pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
           dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
@@ -55,7 +58,7 @@ jobs:
           cat > android-wrapper/app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.INTERNET"/>
-              <application android:label="AN Visual Editor" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:usesCleartextTraffic="false" android:allowBackup="false">
+              <application android:label="AN Visual Editor" android:icon="@drawable/an_icon" android:roundIcon="@drawable/an_icon" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:usesCleartextTraffic="false" android:allowBackup="false">
                   <activity android:name=".MainActivity" android:exported="true">
                       <intent-filter>
                           <action android:name="android.intent.action.MAIN"/>
@@ -91,7 +94,7 @@ jobs:
 
                   web.setWebViewClient(new WebViewClient() {
                       @Override public android.webkit.WebResourceResponse shouldInterceptRequest(WebView view, android.webkit.WebResourceRequest req) {
-                          if("appassets.androidplatform.net".equals(req.getUrl().getHost()) && "/assets/index.html".equals(req.getUrl().getPath())) { try { return new WebResourceResponse("text/html","UTF-8",getAssets().open("index.html")); } catch(Exception e) { return null; } } return null;
+                          if("appassets.androidplatform.net".equals(req.getUrl().getHost())) { String p=req.getUrl().getPath(); try { if("/assets/index.html".equals(p)) return new WebResourceResponse("text/html","UTF-8",getAssets().open("index.html")); if("/assets/assets/an-visual-editor-icon.jpg".equals(p)) return new WebResourceResponse("image/jpeg",null,getAssets().open("assets/an-visual-editor-icon.jpg")); } catch(Exception e) { return null; } } return null;
                       }
                       @Override public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest req) {
                           Uri u=req.getUrl();
