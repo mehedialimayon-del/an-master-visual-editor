@@ -123,3 +123,23 @@ User wants Steps 1–5 done together, with real verified code commits, before pr
 - Inspected .github/workflows/browser-qa.yml: Node.js application environment was already 22, but actions/checkout@v4 and actions/setup-node@v4 used Node.js 20 action runtime. Upgraded both actions to v5 (Node.js 24 runtime) while retaining node-version: 22. Commit d8449df30cf2d70e6ee499c5667743bb2c5d4853. Confirm warning resolution from new GitHub Actions logs before claiming fixed.
 - Added two simulated touch/mobile Playwright regressions for Samsung S23 Ultra (384x824) and A07 (360x800): keyboard text entry, contextual sheet navigation, save/reload persistence, dock geometry, and horizontal overflow. Commit d80d09909caea94795e4bd89a7df8ade6cebd1ac.
 - Expect 28 total browser tests, pending CI verification. Physical Samsung device testing, actual Android soft-keyboard behavior, and cross-browser QA are NOT verified. Preserve an-mve-v1 and an-mve-components-v1 storage and black/orange/white theme.
+
+
+## Stage 9 release gate (2026-11-21)
+- PASS: Browser QA 37/37, GitHub Actions run 44845888932.
+- PASS: Pages build and deployment run 44845889119.
+- Verified commit: 43d4c3d8e3aedd04a81e294c1d4e975452715e3a.
+- SEO Settings title/description/robots persist in localStorage key an-mve-seo-v1; exported HTML includes metadata and complete document markup.
+- Publishing Guide explains manual GitHub Pages publication; automatic publishing to other repositories is NOT implemented.
+- Keyframe export regression tests use DOM click to separate browser actionability from HTML export behavior. This does NOT prove physical mouse/touch click on every device.
+- No manual live production testing was performed.
+
+## Stage 10 QA & Release — STARTED (not PASS)
+Release gates:
+1. GitHub Browser QA + Pages Deployment must both be SUCCESS for the same release commit.
+2. Check browser click actionability for Export HTML after applying keyframes, keyboard accessibility, mobile layout and download behavior; the DOM-click regression alone is insufficient.
+3. Validate cloud authentication and project restore using isolated mocks, verify no credentials or service_role secret exposed, and review form endpoint trust/security.
+4. Validate SEO persistence, exported multi-page navigation, forms, keyframe animation and mobile S23 Ultra/A07 test coverage.
+5. Inspect security and accessibility regressions and record unresolved items. Do not alter existing application data.
+6. Do not run live production end-to-end testing until user explicitly authorizes the final single live test.
+Stage 10 remains PENDING until these gates are satisfied.
