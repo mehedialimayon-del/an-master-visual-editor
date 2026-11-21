@@ -225,3 +225,28 @@ test('media library rejects invalid assets and deduplicates uploaded images', as
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('an-mve-assets-v1')));
   expect(saved).toHaveLength(1);
 });
+
+test('design assistant inserts local hero preset without external requests', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  const before = await page.locator('.stage .item').count();
+  await page.locator('#ribbonAI').click();
+  await expect(page.getByRole('dialog', { name: 'Design assistant' })).toBeVisible();
+  await page.locator('#assistantGoal').selectOption('hero');
+  await page.locator('#assistantInsert').click();
+  await expect(page.locator('.stage .item')).toHaveCount(before + 1);
+  await expect(page.locator('.stage .item').last()).toContainText('Your headline here');
+});
+
+test('form setup rejects private webhook destinations', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  page.once('dialog', dialog => dialog.accept('Contact'));
+  await page.locator('#ribbonForm').click();
+  page.once('dialog', dialog => dialog.accept('Name, Email'));
+  await page.locator('#ribbonFormSettings').click();
+  page.once('dialog', dialog => dialog.accept('webhook'));
+  page.once('dialog', dialog => dialog.accept('https://localhost/submit'));
+  page.once('dialog', dialog => dialog.accept());
+  await page.locator('#ribbonFormSettings').click();
+  const mode = await page.locator('.stage .item').last().count();
+  expect(mode).toBe(1);
+});
