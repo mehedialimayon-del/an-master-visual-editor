@@ -264,3 +264,14 @@ test('published HTML export contains SEO metadata and secure webhook guard', asy
   expect(html).toContain('Valid public HTTPS endpoint required');
   expect(html).toContain('data-site-page');
 });
+
+test('AI assistant requires cloud sign-in and keeps preset insertion available', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('#ribbonAI').click();
+  await page.locator('#assistantPrompt').fill('Create a clean hero section');
+  await page.locator('#assistantAsk').click();
+  await expect(page.locator('#assistantResult')).toHaveText('Sign in with Cloud Projects first');
+  await page.locator('#assistantGoal').selectOption('hero');
+  await page.locator('#assistantInsert').click();
+  await expect(page.locator('.stage .item')).toHaveCount(1);
+});
