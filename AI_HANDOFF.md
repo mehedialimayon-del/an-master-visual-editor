@@ -143,3 +143,13 @@ Release gates:
 5. Inspect security and accessibility regressions and record unresolved items. Do not alter existing application data.
 6. Do not run live production end-to-end testing until user explicitly authorizes the final single live test.
 Stage 10 remains PENDING until these gates are satisfied.
+
+
+## Stage 10 Final QA audit — 2026-11-21
+- Inspected current main source (index.html), Playwright suite, browser-qa workflow, README and this handoff before changes.
+- Baseline verified GitHub Actions Browser QA SUCCESS run 44846040477 and Pages deployment SUCCESS run 44846040659, same commit c48ca27888fc1825d8fbb1b358365f7d9a3fdc00. Stage 9 passed.
+- Read-only Supabase inspection: project ztedjqdilkealvnjwivd, isolated an_mve schema. projects RLS enabled with four policies; form_submissions RLS enabled with two policies. Supabase security advisor returned zero lints. No production records were changed and no live end-to-end testing was done.
+- Found malformed exported shape HTML: `<div style=""` closed style before computed CSS, so the shape's geometry and background were not applied. Fixed in index.html commit 4cad1136fde01220fe366783feb86b9e42e0175b. Strengthened Playwright shape-export regression in commit fd90173487c98114264c84d7b90fda315b3167ca. Verify subsequent GitHub Actions runs before marking this fix PASS.
+- Security/UX finding still pending: cloud login uses JavaScript prompt for password, which displays input visibly; should replace with masked password field and test without storing credentials. Supabase access tokens are currently held in memory; token refresh is not implemented, so long-running cloud sessions may expire. Never expose service-role keys.
+- Coverage limitations: simulated Samsung S23 Ultra/A07 Playwright tests are not physical Android tests; exported keyframe tests use DOM click, which does not guarantee every physical touch/keyboard activation. Publishing Guide is manual, not an automatic deployment integration.
+- Release gate: Stage 10 is NOT PASS until new browser QA + Pages deployment both succeed on same commit, remaining security and accessibility issues are evaluated, and the user authorizes any live test. Preserve all existing localStorage keys, UI and Supabase data.
