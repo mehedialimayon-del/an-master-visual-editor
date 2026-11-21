@@ -47,3 +47,24 @@ test('existing editor canvas and tools are preserved', async ({ page }) => {
   await expect(page.locator('#save')).toBeAttached();
   await expect(page.locator('#export')).toBeAttached();
 });
+
+test('built-in and custom website preview in canvas with safe return', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.getByRole('button', { name: 'My Websites' }).click();
+  const dialog = page.getByRole('dialog', { name: 'My Websites' });
+  await dialog.getByRole('button', { name: 'Preview Field Force Hub in Canvas' }).click();
+  const preview = page.getByRole('region', { name: 'Website preview: Field Force Hub' });
+  await expect(preview).toBeVisible();
+  await expect(preview.locator('iframe')).toHaveAttribute('src', /salesman-performance-app/);
+  await expect(preview.getByRole('link', { name: 'Open Live' })).toHaveAttribute('target', '_blank');
+  await preview.getByRole('button', { name: 'Return to Editor' }).click();
+  await expect(preview).toHaveCount(0);
+  await expect(page.locator('#canvas')).toBeVisible();
+  await page.getByRole('button', { name: 'My Websites' }).click();
+  await dialog.getByPlaceholder('Website name').fill('Custom preview');
+  await dialog.getByPlaceholder('https://your-site.example/').fill('https://custom.example.test/');
+  await dialog.getByRole('button', { name: '+ Add Website' }).click();
+  await dialog.getByRole('button', { name: 'Preview Custom preview in Canvas' }).click();
+  await expect(page.locator('#websiteCanvasPreview iframe')).toHaveAttribute('src', 'https://custom.example.test/');
+  await page.getByRole('button', { name: 'Return to Editor' }).click();
+});
