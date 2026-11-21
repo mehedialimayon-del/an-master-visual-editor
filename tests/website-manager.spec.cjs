@@ -129,11 +129,10 @@ test('external website iframe retains origin for secure LockManager APIs', async
 test('custom website previews remain sandboxed', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
   await page.getByRole('button', { name: 'My Websites' }).click();
-  await page.getByRole('button', { name: '+ Add Website' }).click();
   const dialog = page.locator('#websitePicker');
   await dialog.getByPlaceholder('Website name').fill('Custom sandbox test');
-  await dialog.getByPlaceholder('https://example.com').fill('https://example.com/');
-  await dialog.getByRole('button', { name: 'Save Website' }).click();
+  await dialog.getByPlaceholder('https://your-site.example/').fill('https://example.com/');
+  await dialog.getByRole('button', { name: '+ Add Website' }).click();
   await dialog.getByRole('button', { name: 'Preview Custom sandbox test in Canvas' }).click();
   await expect(page.locator('#websiteCanvasPreview iframe')).toHaveAttribute('sandbox', /allow-scripts/);
 });
