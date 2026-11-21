@@ -341,6 +341,7 @@ test('button links to another editor page in preview and survives save reload', 
 });
 
 test('visual style presets appear for text and apply orange glow', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/');
   await page.locator('#text').click();
   await page.locator('.mobile-dock [data-panel="text"]').click();
