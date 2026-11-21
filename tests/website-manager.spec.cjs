@@ -117,3 +117,11 @@ test('full-screen live bypasses iframe clipping and retains exact destination', 
   await expect(page.locator('body > #websiteCanvasPreview')).toHaveCount(1);
   await expect(page.locator('#websiteCanvasPreview iframe')).toHaveCSS('transform', 'none');
 });
+
+test('external website iframe retains origin for secure LockManager APIs', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.getByRole('button', { name: 'Preview A&N Overseas in Canvas' }).click();
+  await expect(page.locator('#websiteCanvasPreview iframe')).toHaveAttribute('sandbox', /allow-same-origin/);
+  await expect(page.locator('#websiteCanvasPreview iframe')).toHaveAttribute('src', 'https://mehedialimayon-del.github.io/an-overseas-education-/');
+});
