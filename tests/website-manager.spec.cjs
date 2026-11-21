@@ -343,9 +343,9 @@ test('button links to another editor page in preview and survives save reload', 
 test('visual style presets appear for text and apply orange glow', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/');
-  await page.locator('#text').click();
-  // Open the editing sheet directly: the mobile quick-text overlay can cover the dock.
-  await page.evaluate(() => openPanel('text'));
+  // Set up a text element directly: the mobile header is horizontally scrollable and
+  // its +Text control may be outside the viewport. This test targets the preset UI.
+  await page.evaluate(() => { add('text'); openPanel('text'); });
   await page.locator('.sheet-tabs button[data-tab="Visual Styles"]').click();
   await expect(page.getByRole('button', { name: 'Apply Neon Glow preset' })).toBeVisible();
   await page.getByRole('button', { name: 'Apply Neon Glow preset' }).click();
