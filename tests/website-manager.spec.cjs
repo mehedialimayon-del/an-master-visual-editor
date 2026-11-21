@@ -370,3 +370,19 @@ test('premium mobile icon dock opens contextual visual tool galleries', async ({
   await page.getByRole('button', { name: 'Open Styles tools' }).click();
   await expect(page.locator('.an-preset-wrap')).toHaveClass(/visible/);
 });
+
+test('mobile editing sheet shows text controls without duplicated gallery and resets scroll on tab change', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('.mobile-dock [data-panel="text"]').click();
+  await expect(page.locator('.tools')).toHaveClass(/sheet-open/);
+  await expect(page.locator('.an-tool-gallery')).toBeHidden();
+  await expect(page.locator('#label')).toBeVisible();
+  await expect(page.locator('.sheet-tabs button.active')).toHaveText('Content');
+  const height = await page.locator('.tools').evaluate(el => el.getBoundingClientRect().height);
+  expect(height).toBeLessThanOrEqual(355);
+  await page.locator('.mobile-dock [data-panel="button"]').click();
+  await expect(page.locator('#linkPage')).toBeVisible();
+  await page.locator('.mobile-dock [data-panel="screen"]').click();
+  await expect(page.locator('.sheet-tabs button.active')).toHaveText('Screen');
+});
