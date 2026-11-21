@@ -239,7 +239,7 @@ test('design assistant inserts local hero preset without external requests', asy
 
 test('form setup rejects private webhook destinations', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
-  const answers = ['Contact', 'Name, Email', 'webhook', 'https://localhost/submit', ''];
+  const answers = ['Contact', 'Name, Email', 'webhook', 'https://localhost/submit'];
   page.on('dialog', dialog => dialog.type() === 'alert' ? dialog.accept() : dialog.accept(answers.shift() || ''));
   await page.locator('#ribbonForm').click();
   await page.locator('#ribbonFormSettings').click();
