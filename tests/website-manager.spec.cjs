@@ -96,3 +96,12 @@ test('preview offers original GitHub source without modifying the live website',
   await expect(source).toHaveAttribute('rel', /noopener/);
   await expect(page.locator('#websiteCanvasPreview iframe')).toHaveAttribute('src', /salesman-performance-app/);
 });
+
+test('website manager provides direct GitHub source editing entry', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.getByRole('button', { name: 'My Websites' }).click();
+  const link = page.getByRole('link', { name: 'Edit A&N Overseas source in GitHub web editor' });
+  await expect(link).toHaveAttribute('href', 'https://github.dev/mehedialimayon-del/an-overseas-education-');
+  await expect(link).toHaveAttribute('target', '_blank');
+  await expect(link).toHaveAttribute('rel', /noopener/);
+});
