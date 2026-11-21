@@ -164,3 +164,9 @@ Stage 10 remains PENDING until these gates are satisfied.
 - Added narrow 360px mobile contextual-sheet keyboard Export HTML test including Save/Reload, and exported keyframe reduced-motion preference test. Tests only, no app code or Supabase data changed. Commits 5d3f31842f880ec3a0a912a68a12ee5588c00a70 and caef74d46771d12dc4360a93cd6f52a496352d84.
 - Check new GitHub Browser QA run and Pages deployment on latest commit before claiming 41/41. The 39/39 result belongs to the previous commit, not these new tests.
 - Stage 10 remains not fully released: real Samsung hardware QA and authorized live Supabase E2E test are pending; token refresh and long-session behavior need security review. No live test authorized.
+
+## Stage 10 cloud token refresh (2026-11-21)
+- Reviewed main 39f90f410e8f1e15c868a20b5222a9f2c81f11aa (41/41 QA and Pages PASS). Cloud session was in-memory and RPC failed after access token expiry.
+- Added single refresh-token grant retry only for HTTP 401 authenticated RPC calls; rotates in-memory session on success, clears session on refresh failure, no localStorage credential persistence. Code commit 16c4f9951e5a3e1094b0f63cd96bacd3e8d8c26e.
+- Added Playwright mocked 401, refresh, retry and editor-data-preservation test; no live Supabase test or data writes. Test commit bb509060af19af5f02200484abd5a9a6b729d0bb.
+- Verify new Browser QA 42/42 and Pages deployment on final SHA. Physical Samsung and authorized live Supabase E2E remain blocked; do not claim full release PASS.
