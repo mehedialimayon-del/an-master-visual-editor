@@ -170,3 +170,9 @@ Stage 10 remains PENDING until these gates are satisfied.
 - Added single refresh-token grant retry only for HTTP 401 authenticated RPC calls; rotates in-memory session on success, clears session on refresh failure, no localStorage credential persistence. Code commit 16c4f9951e5a3e1094b0f63cd96bacd3e8d8c26e.
 - Added Playwright mocked 401, refresh, retry and editor-data-preservation test; no live Supabase test or data writes. Test commit bb509060af19af5f02200484abd5a9a6b729d0bb.
 - Verify new Browser QA 42/42 and Pages deployment on final SHA. Physical Samsung and authorized live Supabase E2E remain blocked; do not claim full release PASS.
+
+## Responsive breakpoint data integrity fix — 2026-11-21
+- Found destructive breakpoint restoration: previous snapshots replaced whole page.items, overwriting shared text/styles and potentially dropping new elements. Fixed by storing only x/y/w/h keyed by stable item ID per page, preserving shared item content and other properties. Existing legacy array-of-items breakpoint snapshots are read as geometry-only for migration compatibility.
+- Switching viewports captures outgoing geometry automatically and restores target geometry by item ID; new elements fall back to proportional scaling. Undo/redo and localStorage retain breakpointLayouts.
+- Code commit 9604b489c66488e4a5f956c3614c19dfdb6d34d4; regression commit 6737167ef1d4dcd353088576920c6eaad9655767. Verify new Browser QA and Pages run before claiming PASS. Do not perform live Supabase tests.
+- Remaining release gates: physical Samsung touch/browser QA, authorized cloud E2E, and manual accessibility/security acceptance. Ten-stage roadmap only; do not invent Stage 11.
