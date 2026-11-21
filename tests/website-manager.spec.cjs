@@ -106,3 +106,14 @@ test('website manager provides direct GitHub source editing entry', async ({ pag
   await expect(link).toHaveAttribute('target', '_blank');
   await expect(link).toHaveAttribute('rel', /noopener/);
 });
+
+test('full-screen live bypasses iframe clipping and retains exact destination', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.getByRole('button', { name: 'Preview A&N Overseas in Canvas' }).click();
+  const live = page.getByRole('link', { name: 'Open A&N Overseas in full screen live view' });
+  await expect(live).toHaveAttribute('href', 'https://mehedialimayon-del.github.io/an-overseas-education-/');
+  await expect(live).not.toHaveAttribute('target', '_blank');
+  await expect(page.locator('body > #websiteCanvasPreview')).toHaveCount(1);
+  await expect(page.locator('#websiteCanvasPreview iframe')).toHaveCSS('transform', 'none');
+});
