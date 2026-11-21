@@ -122,6 +122,18 @@ test('external website iframe retains origin for secure LockManager APIs', async
   await page.goto('http://127.0.0.1:4173/');
   await page.getByRole('button', { name: 'My Websites' }).click();
   await page.getByRole('button', { name: 'Preview A&N Overseas in Canvas' }).click();
-  await expect(page.locator('#websiteCanvasPreview iframe')).toHaveAttribute('sandbox', /allow-same-origin/);
+  await expect(page.locator('#websiteCanvasPreview iframe')).not.toHaveAttribute('sandbox');
   await expect(page.locator('#websiteCanvasPreview iframe')).toHaveAttribute('src', 'https://mehedialimayon-del.github.io/an-overseas-education-/');
+});
+
+test('custom website previews remain sandboxed', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.getByRole('button', { name: '+ Add Website' }).click();
+  const dialog = page.locator('#websitePicker');
+  await dialog.getByPlaceholder('Website name').fill('Custom sandbox test');
+  await dialog.getByPlaceholder('https://example.com').fill('https://example.com/');
+  await dialog.getByRole('button', { name: 'Save Website' }).click();
+  await dialog.getByRole('button', { name: 'Preview Custom sandbox test in Canvas' }).click();
+  await expect(page.locator('#websiteCanvasPreview iframe')).toHaveAttribute('sandbox', /allow-scripts/);
 });
