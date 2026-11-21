@@ -217,7 +217,7 @@ test('pages can be duplicated and undone', async ({ page }) => {
 test('media library rejects invalid assets and deduplicates uploaded images', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
   await page.locator('#openAssets').click();
-  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==', 'base64');
+  const png = Buffer.from(await page.evaluate(() => { const canvas=document.createElement('canvas');canvas.width=2;canvas.height=2;canvas.getContext('2d').fillRect(0,0,2,2);return canvas.toDataURL('image/png').split(',')[1] }), 'base64');
   await page.locator('#assetFile').setInputFiles({ name: 'tiny.png', mimeType: 'image/png', buffer: png });
   await expect(page.locator('#assetRows .asset-card')).toHaveCount(1);
   await page.locator('#assetFile').setInputFiles({ name: 'tiny.png', mimeType: 'image/png', buffer: png });
