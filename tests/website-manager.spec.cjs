@@ -355,3 +355,18 @@ test('visual style presets appear for text and apply orange glow', async ({ page
   const changed = await page.evaluate(() => { const i = items.find(v => v.id === selected); return { color: i.color, effect: i.effect, shadow: i.shadow }; });
   expect(changed).toEqual({ color: '#ff6600', effect: 'glow', shadow: 12 });
 });
+
+test('premium mobile icon dock opens contextual visual tool galleries', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/');
+  await expect(page.locator('.mobile-dock .an-dock-icon')).toHaveCount(5);
+  await page.locator('.mobile-dock [data-panel="image"]').click();
+  await expect(page.locator('.an-tool-gallery .an-tool-tile')).toHaveCount(4);
+  await page.getByRole('button', { name: 'Open Looks tools' }).click();
+  await expect(page.locator('.an-image-gallery')).toHaveClass(/visible/);
+  await page.getByRole('button', { name: 'Open Adjust tools' }).click();
+  await expect(page.locator('.an-image-gallery')).not.toHaveClass(/visible/);
+  await page.locator('.mobile-dock [data-panel="text"]').click();
+  await page.getByRole('button', { name: 'Open Styles tools' }).click();
+  await expect(page.locator('.an-preset-wrap')).toHaveClass(/visible/);
+});
