@@ -394,9 +394,11 @@ test('exported HTML contains custom keyframe CSS for text and buttons',async({pa
  await page.goto('http://127.0.0.1:4173/');
  await page.locator('#text').click();
  await page.locator('#applyKeyframes').click();
- const downloadPromise=page.waitForEvent('download');
+ await page.evaluate(()=>{const a=document.querySelector('#export'),old=a.onclick;a.onclick=function(e){try{return old.call(this,e)}catch(err){window.__exportError=err.stack||String(err)}}});
+ const pending=page.waitForEvent('download',{timeout:3000}).catch(()=>null);
  await page.locator('#export').click();
- const file=observed;
+ const file=await pending;
+ if(!file)throw Error('Export failed: '+await page.evaluate(()=>window.__exportError));
  const html=require('fs').readFileSync(await file.path(),'utf8');
  expect(html).toContain('@keyframes anCustomKeyframe');
  expect(html).toContain('animation:anCustomKeyframe');
