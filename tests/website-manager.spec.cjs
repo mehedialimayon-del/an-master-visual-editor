@@ -287,3 +287,39 @@ test('cloud controls preserve local data when sign-in is cancelled', async ({ pa
   const after = await page.evaluate(() => localStorage.getItem('an-mve-v1'));
   expect(after).toBe(before);
 });
+
+test('authenticated AI response renders as text, not executable HTML', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.evaluate(() => { mveSession = { access_token: 'qa-token' }; });
+  await page.route('**/functions/v1/an-mve-ai-design', route => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({ suggestion: '<img src=x onerror=alert(1)>Try a simple orange CTA' })
+  }));
+  await page.locator('#ribbonAI').click();
+  await page.locator('#assistantPrompt').fill('Suggest a hero layout');
+  await page.locator('#assistantAsk').click();
+  await expect(page.locator('#assistantResult')).toContainText('Try a simple orange CTA');
+  await expect(page.locator('#assistantResult img')).toHaveCount(0);
+});
+
+test('cloud load keeps a restorable backup of existing local project', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('#text').click();
+  page.once('dialog', dialog => dialog.accept());
+  await page.locator('#save').click();
+  const original = await page.evaluate(() => localStorage.getItem('an-mve-v1'));
+  await page.evaluate(() => { mveSession = { access_token: 'qa-token' }; });
+  const id = 'a9630000-0000-4000-8000-000000000001';
+  await page.route('**/rest/v1/rpc/an_mve_list_projects', route => route.fulfill({
+    status: 200, contentType: 'application/json', body: JSON.stringify([{ id, title: 'QA project' }])
+  }));
+  await page.route('**/rest/v1/rpc/an_mve_get_project', route => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({ pages: [{ name: 'Imported', items: [] }], items: [], pageIndex: 0, device: '390x640', theme: 'dark', layout: 'fixed', breakpointLayouts: {} })
+  }));
+  const answers = ['load', id];
+  page.on('dialog', dialog => dialog.type() === 'prompt' ? dialog.accept(answers.shift() || '') : dialog.accept());
+  await page.locator('#cloudProjects').click();
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('an-mve-cloud-restore-backup-v1'))).toBe(original);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('an-mve-v1')).pages[0].name)).toBe('Imported');
+});
