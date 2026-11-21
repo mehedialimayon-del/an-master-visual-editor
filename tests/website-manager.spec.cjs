@@ -346,9 +346,12 @@ test('visual style presets appear for text and apply orange glow', async ({ page
   // Set up a text element directly: the mobile header is horizontally scrollable and
   // its +Text control may be outside the viewport. This test targets the preset UI.
   await page.evaluate(() => { add('text'); openPanel('text'); });
-  await page.locator('.sheet-tabs button[data-tab="Visual Styles"]').click();
-  await expect(page.getByRole('button', { name: 'Apply Neon Glow preset' })).toBeVisible();
-  await page.getByRole('button', { name: 'Apply Neon Glow preset' }).click();
+  // The sheet is a mobile scroll container; activate its tab without a
+  // Playwright scroll-to-click wait, then exercise the actual preset button.
+  await page.evaluate(() => document.querySelector('.sheet-tabs button[data-tab="Visual Styles"]').click());
+  const neon = page.getByRole('button', { name: 'Apply Neon Glow preset' });
+  await expect(neon).toBeVisible({ timeout: 5000 });
+  await neon.click({ timeout: 5000 });
   const changed = await page.evaluate(() => { const i = items.find(v => v.id === selected); return { color: i.color, effect: i.effect, shadow: i.shadow }; });
   expect(changed).toEqual({ color: '#ff6600', effect: 'glow', shadow: 12 });
 });
