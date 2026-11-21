@@ -158,3 +158,9 @@ Stage 10 remains PENDING until these gates are satisfied.
 - Replaced visible cloud password JavaScript prompt with a masked input type=password overlay. It is removed and cleared after submission or cancellation; existing Supabase password auth RPC, in-memory access token and local data remain unchanged. Code commit 47d62c57108fb7f165cacf8aa9434a42e55ef61e.
 - Updated mocked cloud save test to enter masked password (404842bcf03d28d2588d7590fada914d89369153). Added keyboard-triggered Export HTML download and cancelled cloud login regressions (c8613a96c1e7cfc1cb0709700410c8944c0822d3). Browser QA and Pages deployment for final commit must be checked.
 - Password masking addresses shoulder-surfing in the login prompt but does not add token refresh, MFA, or real Supabase end-to-end verification. The final live test remains explicitly unapproved.
+
+## 2026-11-21 Stage 10 additional deep browser regressions
+- Inspected main at 4489ba773a0f3900af04bcf0b611718b60dc3cbe; confirmed Browser QA run 44847907314 had 39/39 passed and Pages deployment run 44847906742 succeeded.
+- Added narrow 360px mobile contextual-sheet keyboard Export HTML test including Save/Reload, and exported keyframe reduced-motion preference test. Tests only, no app code or Supabase data changed. Commits 5d3f31842f880ec3a0a912a68a12ee5588c00a70 and caef74d46771d12dc4360a93cd6f52a496352d84.
+- Check new GitHub Browser QA run and Pages deployment on latest commit before claiming 41/41. The 39/39 result belongs to the previous commit, not these new tests.
+- Stage 10 remains not fully released: real Samsung hardware QA and authorized live Supabase E2E test are pending; token refresh and long-session behavior need security review. No live test authorized.
