@@ -129,3 +129,19 @@ test('custom website previews remain sandboxed', async ({ page }) => {
   await dialog.getByRole('button', { name: 'Preview Custom sandbox test in Canvas' }).click();
   await expect(page.locator('#websiteCanvasPreview iframe')).toHaveAttribute('sandbox', /allow-scripts/);
 });
+
+test('keyboard undo and redo shortcuts do not interfere with text inputs', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.getByRole('button', { name: 'T+ Text' }).first().click();
+  await expect(page.locator('#canvas .item')).toHaveCount(1);
+  await page.locator('body').click({position:{x:2,y:2}});
+  await page.keyboard.press('Control+z');
+  await expect(page.locator('#canvas .item')).toHaveCount(0);
+  await page.keyboard.press('Control+Shift+z');
+  await expect(page.locator('#canvas .item')).toHaveCount(1);
+  const name = page.locator('#newWebsiteName');
+  await page.getByRole('button', { name: 'My Websites' }).click();
+  await name.fill('Draft text');
+  await name.press('Control+z');
+  await expect(page.locator('#canvas .item')).toHaveCount(1);
+});
