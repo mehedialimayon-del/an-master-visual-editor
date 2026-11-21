@@ -162,7 +162,7 @@ test('responsive breakpoint geometry survives device round trip and local save',
   await page.locator('#text').click();
   const original = await page.locator('.stage .item').first().evaluate(el => ({ left: el.style.left, width: el.style.width }));
   const devices = await page.locator('#device option').evaluateAll(options => options.map(o => o.value));
-  const other = devices.find(v => /^\\d+x\\d+$/.test(v) && v !== '390x640');
+  const other = devices.find(v => /^\d+x\d+$/.test(v) && v !== '390x640');
   expect(other).toBeTruthy();
   await page.locator('#device').selectOption(other);
   await page.locator('#device').selectOption('390x640');
