@@ -156,3 +156,34 @@ test('undo and redo preserve a new element after repeated property editing', asy
   await page.locator('#redo').click();
   await expect(page.locator('.stage .item')).toHaveCount(before + 1);
 });
+
+test('responsive breakpoint geometry survives device round trip and local save', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('#text').click();
+  const original = await page.locator('.stage .item').first().evaluate(el => ({ left: el.style.left, width: el.style.width }));
+  const devices = await page.locator('#device option').evaluateAll(options => options.map(o => o.value));
+  const other = devices.find(v => /^\\d+x\\d+$/.test(v) && v !== '390x640');
+  expect(other).toBeTruthy();
+  await page.locator('#device').selectOption(other);
+  await page.locator('#device').selectOption('390x640');
+  const restored = await page.locator('.stage .item').first().evaluate(el => ({ left: el.style.left, width: el.style.width }));
+  expect(restored.left).toBe(original.left);
+  expect(restored.width).toBe(original.width);
+  page.once('dialog', dialog => dialog.accept());
+  await page.locator('#save').click();
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('an-mve-v1')));
+  expect(saved.breakpointLayouts['390x640']).toBeTruthy();
+  expect(saved.pages).toHaveLength(1);
+});
+
+test('style changes can be undone without deleting the edited element', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('#text').click();
+  const initial = await page.locator('.stage .item').first().evaluate(el => el.style.color);
+  await page.locator('#color').fill('#ff0000');
+  await page.locator('#color').dispatchEvent('input');
+  await expect(page.locator('.stage .item').first()).toHaveCSS('color', 'rgb(255, 0, 0)');
+  await page.locator('#undo').click();
+  await expect(page.locator('.stage .item')).toHaveCount(1);
+  expect(await page.locator('.stage .item').first().evaluate(el => el.style.color)).toBe(initial);
+});
