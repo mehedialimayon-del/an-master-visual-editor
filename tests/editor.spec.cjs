@@ -678,3 +678,19 @@ test('Stage 10 expired cloud token refreshes once and retries save without losin
  expect(refreshes).toBe(1);
  await expect(page.locator('.item[data-type="text"]')).toHaveCount(1);
 });
+
+test('independent breakpoint geometry preserves shared text edits across viewport switches',async({page})=>{
+ page.on('dialog',d=>d.accept());
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ await page.locator('#saveBreakpointLayout').click();
+ await page.locator('#device').selectOption('768x1024');
+ await page.locator('#label').fill('Shared text survives breakpoint');
+ await page.locator('#saveBreakpointLayout').click();
+ await page.locator('#device').selectOption('390x640');
+ await expect(page.locator('.item[data-type="text"]')).toContainText('Shared text survives breakpoint');
+ await page.locator('#save').click();
+ await page.reload();
+ await page.locator('#device').selectOption('768x1024');
+ await expect(page.locator('.item[data-type="text"]')).toContainText('Shared text survives breakpoint');
+});
