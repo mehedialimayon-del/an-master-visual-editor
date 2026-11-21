@@ -275,3 +275,14 @@ test('AI assistant requires cloud sign-in and keeps preset insertion available',
   await page.locator('#assistantInsert').click();
   await expect(page.locator('.stage .item')).toHaveCount(1);
 });
+
+test('cloud controls preserve local data when sign-in is cancelled', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('#text').click();
+  await page.locator('#save').click();
+  const before = await page.evaluate(() => localStorage.getItem('an-mve-v1'));
+  page.once('dialog', dialog => dialog.dismiss());
+  await page.locator('#cloudProjects').click();
+  const after = await page.evaluate(() => localStorage.getItem('an-mve-v1'));
+  expect(after).toBe(before);
+});
