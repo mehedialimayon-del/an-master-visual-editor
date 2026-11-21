@@ -107,25 +107,18 @@ test('website manager provides direct GitHub source editing entry', async ({ pag
   await expect(link).toHaveAttribute('rel', /noopener/);
 });
 
-test('full-screen live bypasses iframe clipping and retains exact destination', async ({ page }) => {
+test('A&N exact live preview navigates to official website without iframe', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
   await page.getByRole('button', { name: 'My Websites' }).click();
-  await page.getByRole('button', { name: 'Preview A&N Overseas in Canvas' }).click();
-  const live = page.getByRole('link', { name: 'Open A&N Overseas in full screen live view' });
-  await expect(live).toHaveAttribute('href', 'https://mehedialimayon-del.github.io/an-overseas-education-/');
-  await expect(live).not.toHaveAttribute('target', '_blank');
-  await expect(page.locator('body > #websiteCanvasPreview')).toHaveCount(1);
-  await expect(page.locator('#websiteCanvasPreview iframe')).toHaveCSS('transform', 'none');
+  const dialog = page.getByRole('dialog', { name: 'My Websites' });
+  const row = dialog.locator('.website-row').filter({ hasText: 'A&N Overseas' });
+  await expect(row.getByRole('button', { name: 'Preview A&N Overseas in Canvas' })).toHaveText('Open Exact Live View');
+  await expect(row.getByRole('link', { name: '🌐 Live Website' })).toHaveAttribute('href', 'https://anoverseaseducation.com/');
+  await page.route('https://anoverseaseducation.com/', route => route.fulfill({status:200,contentType:'text/html',body:'<h1>Official live website</h1>'}));
+  await row.getByRole('button', { name: 'Preview A&N Overseas in Canvas' }).click();
+  await expect(page).toHaveURL('https://anoverseaseducation.com/');
+  await expect(page.getByRole('heading', { name: 'Official live website' })).toBeVisible();
 });
-
-test('external website iframe retains origin for secure LockManager APIs', async ({ page }) => {
-  await page.goto('http://127.0.0.1:4173/');
-  await page.getByRole('button', { name: 'My Websites' }).click();
-  await page.getByRole('button', { name: 'Preview A&N Overseas in Canvas' }).click();
-  await expect(page.locator('#websiteCanvasPreview iframe')).not.toHaveAttribute('sandbox');
-  await expect(page.locator('#websiteCanvasPreview iframe')).toHaveAttribute('src', 'https://mehedialimayon-del.github.io/an-overseas-education-/');
-});
-
 test('custom website previews remain sandboxed', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
   await page.getByRole('button', { name: 'My Websites' }).click();
