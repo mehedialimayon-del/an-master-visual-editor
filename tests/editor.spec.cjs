@@ -512,6 +512,7 @@ test('Stage 7 real shapes render and export',async({page})=>{
  await page.locator('#export').click();
  const html=require('fs').readFileSync(await (await promise).path(),'utf8');
  expect(html).toContain('border-radius:50%');
+ expect(html).toMatch(/<div style="position:absolute;[^\"]*background:#[0-9a-f]{6};border-radius:50%"/i);
 });
 test('Stage 7 editable tables persist after save and reload',async({page})=>{
  await page.goto('http://127.0.0.1:4173/');
