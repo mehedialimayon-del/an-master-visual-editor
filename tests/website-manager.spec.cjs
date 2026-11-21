@@ -323,3 +323,19 @@ test('cloud load keeps a restorable backup of existing local project', async ({ 
   await expect.poll(() => page.evaluate(() => localStorage.getItem('an-mve-cloud-restore-backup-v1'))).toBe(original);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('an-mve-v1')).pages[0].name)).toBe('Imported');
 });
+
+test('button links to another editor page in preview and survives save reload', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.evaluate(() => {
+    pages.push({ name: 'QA Test Page', items: [{ id: 'qa-text', type: 'text', label: 'Page 2 Test', x: 30, y: 60, w: 180, h: 50, size: 20, color: '#111111' }] });
+    render();
+  });
+  await page.locator('#button').click();
+  await expect(page.locator('#linkPage option')).toHaveCount(3);
+  await page.locator('#linkPage').selectOption('1');
+  await expect(page.locator('#linkPage')).toHaveValue('1');
+  await page.locator('#preview').click();
+  await page.locator('.stage .item[data-type="button"]').click();
+  await expect(page.locator('#currentPageTitle')).toHaveText('QA Test Page');
+  await expect(page.locator('.stage')).toContainText('Page 2 Test');
+});
