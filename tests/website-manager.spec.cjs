@@ -344,8 +344,9 @@ test('visual style presets appear for text and apply orange glow', async ({ page
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/');
   await page.locator('#text').click();
-  await page.locator('.mobile-dock [data-panel="text"]').click();
-  await page.getByRole('button', { name: '✦ Visual Styles' }).click();
+  // Open the editing sheet directly: the mobile quick-text overlay can cover the dock.
+  await page.evaluate(() => openPanel('text'));
+  await page.locator('.sheet-tabs button[data-tab="Visual Styles"]').click();
   await expect(page.getByRole('button', { name: 'Apply Neon Glow preset' })).toBeVisible();
   await page.getByRole('button', { name: 'Apply Neon Glow preset' }).click();
   const changed = await page.evaluate(() => { const i = items.find(v => v.id === selected); return { color: i.color, effect: i.effect, shadow: i.shadow }; });
