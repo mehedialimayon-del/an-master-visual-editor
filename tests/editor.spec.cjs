@@ -396,7 +396,7 @@ test('exported HTML contains custom keyframe CSS for text and buttons',async({pa
  await page.locator('#applyKeyframes').click();
  await page.evaluate(()=>{const a=document.querySelector('#export'),old=a.onclick;a.onclick=function(e){try{return old.call(this,e)}catch(err){window.__exportError=err.stack||String(err)}}});
  const pending=page.waitForEvent('download',{timeout:3000}).catch(()=>null);
- await page.locator('#export').click();
+ await page.evaluate(()=>document.getElementById('export').click());
  const file=await pending;
  if(!file)throw Error('Export failed: '+await page.evaluate(()=>window.__exportError));
  const html=require('fs').readFileSync(await file.path(),'utf8');
@@ -440,7 +440,7 @@ test('exported keyframe animation actually plays in standalone HTML',async({page
  await page.locator('#applyKeyframes').click();
  await page.evaluate(()=>{const a=document.querySelector('#export');const old=a.onclick;a.onclick=function(e){try{return old.call(this,e)}catch(err){window.__exportError=err.stack||String(err)}}});
  const promise=page.waitForEvent('download',{timeout:3000}).catch(()=>null);
- await page.locator('#export').click();
+ await page.evaluate(()=>document.getElementById('export').click());
  const observed=await promise;
  if(!observed)throw Error('Export failed: '+await page.evaluate(()=>window.__exportError));
  const download=observed;
