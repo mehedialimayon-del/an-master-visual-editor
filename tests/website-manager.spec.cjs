@@ -250,3 +250,17 @@ test('form setup rejects private webhook destinations', async ({ page }) => {
   expect(mode).toBeTruthy();
   expect(answers).toHaveLength(0);
 });
+
+test('published HTML export contains SEO metadata and secure webhook guard', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  const downloadPromise = page.waitForEvent('download');
+  await page.locator('#export').click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('visual-site.html');
+  const fs = require('node:fs');
+  const html = fs.readFileSync(await download.path(), 'utf8');
+  expect(html).toContain('<meta name="description"');
+  expect(html).toContain('<meta name="robots"');
+  expect(html).toContain('Valid public HTTPS endpoint required');
+  expect(html).toContain('data-site-page');
+});
