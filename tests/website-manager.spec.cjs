@@ -187,3 +187,29 @@ test('style changes can be undone without deleting the edited element', async ({
   await expect(page.locator('.stage .item')).toHaveCount(1);
   expect(await page.locator('.stage .item').first().evaluate(el => el.style.color)).toBe(initial);
 });
+
+test('page templates save and insert without reusing element ids', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('#text').click();
+  page.once('dialog', dialog => dialog.accept('QA Template'));
+  await page.locator('#savePageTemplate').click();
+  await expect(page.locator('#components option')).toHaveCount(2);
+  await page.locator('#components').selectOption({ label: 'QA Template' });
+  await page.locator('#insertComponent').click();
+  await expect(page.locator('.stage .item')).toHaveCount(2);
+  const ids = await page.locator('.stage .item').evaluateAll(nodes => nodes.map(n => n.dataset.itemId));
+  expect(new Set(ids).size).toBe(2);
+  await page.reload();
+  await expect(page.locator('#components option')).toHaveCount(2);
+});
+
+test('pages can be duplicated and undone', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('#text').click();
+  await page.locator('#duplicatePage').click();
+  await expect(page.locator('#page option')).toHaveCount(2);
+  await expect(page.locator('.stage .item')).toHaveCount(1);
+  await page.locator('#undo').click();
+  await expect(page.locator('#page option')).toHaveCount(1);
+  await expect(page.locator('.stage .item')).toHaveCount(1);
+});
