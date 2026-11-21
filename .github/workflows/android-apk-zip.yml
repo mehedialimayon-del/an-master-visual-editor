@@ -50,7 +50,7 @@ jobs:
                   versionName '1.0'
               }
           }
-          dependencies { implementation 'androidx.webkit:webkit:1.12.1' }
+
           EOF
           cat > android-wrapper/app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -74,7 +74,7 @@ jobs:
           import android.webkit.WebChromeClient;
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
-          import androidx.webkit.WebViewAssetLoader;
+          import android.webkit.WebResourceResponse;
           import androidx.activity.result.ActivityResultLauncher;
           import androidx.activity.result.contract.ActivityResultContracts;
           public class MainActivity extends Activity {
@@ -88,10 +88,10 @@ jobs:
                   web.getSettings().setDomStorageEnabled(true);
                   web.getSettings().setAllowFileAccess(false);
                   web.getSettings().setAllowContentAccess(true);
-                  WebViewAssetLoader loader = new WebViewAssetLoader.Builder().addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this)).build();
+
                   web.setWebViewClient(new WebViewClient() {
                       @Override public android.webkit.WebResourceResponse shouldInterceptRequest(WebView view, android.webkit.WebResourceRequest req) {
-                          return loader.shouldInterceptRequest(req.getUrl());
+                          if("appassets.androidplatform.net".equals(req.getUrl().getHost()) && "/assets/index.html".equals(req.getUrl().getPath())) { try { return new WebResourceResponse("text/html","UTF-8",getAssets().open("index.html")); } catch(Exception e) { return null; } } return null;
                       }
                       @Override public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest req) {
                           Uri u=req.getUrl();
