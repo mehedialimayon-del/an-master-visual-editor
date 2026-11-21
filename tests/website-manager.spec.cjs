@@ -213,3 +213,15 @@ test('pages can be duplicated and undone', async ({ page }) => {
   await expect(page.locator('#page option')).toHaveCount(1);
   await expect(page.locator('.stage .item')).toHaveCount(1);
 });
+
+test('media library rejects invalid assets and deduplicates uploaded images', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('#openAssets').click();
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==', 'base64');
+  await page.locator('#assetFile').setInputFiles({ name: 'tiny.png', mimeType: 'image/png', buffer: png });
+  await expect(page.locator('#assetRows .asset-card')).toHaveCount(1);
+  await page.locator('#assetFile').setInputFiles({ name: 'tiny.png', mimeType: 'image/png', buffer: png });
+  await expect(page.locator('#assetRows .asset-card')).toHaveCount(1);
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('an-mve-assets-v1')));
+  expect(saved).toHaveLength(1);
+});
