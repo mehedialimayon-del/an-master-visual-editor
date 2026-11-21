@@ -48,7 +48,7 @@ jobs:
               defaultConfig {
                   applicationId 'com.an.visualeditor'
                   minSdk 26
-                  targetSdk 35
+                  targetSdk 34
                   versionCode 1
                   versionName '1.0'
               }
@@ -91,6 +91,7 @@ jobs:
                   getWindow().setStatusBarColor(Color.rgb(18,5,30));
                   getWindow().setNavigationBarColor(Color.rgb(18,5,30));
                   getWindow().getDecorView().setSystemUiVisibility(0);
+                  getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
                   getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
                   web = new WebView(this);
                   setContentView(web);
