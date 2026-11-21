@@ -279,6 +279,7 @@ test('AI assistant requires cloud sign-in and keeps preset insertion available',
 test('cloud controls preserve local data when sign-in is cancelled', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
   await page.locator('#text').click();
+  page.once('dialog', dialog => dialog.accept());
   await page.locator('#save').click();
   const before = await page.evaluate(() => localStorage.getItem('an-mve-v1'));
   page.once('dialog', dialog => dialog.dismiss());
