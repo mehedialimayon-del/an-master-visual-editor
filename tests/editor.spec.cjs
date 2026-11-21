@@ -556,12 +556,14 @@ test('Stage 8 cloud project save uses authenticated RPC and keeps existing local
   return route.fulfill({status:404,contentType:'application/json',body:'{}'});
  });
  await page.goto('http://127.0.0.1:4173/');
+ let finish;const completed=new Promise(resolve=>finish=resolve);
  page.on('dialog',async d=>{
   if(d.type()==='prompt'){const msg=d.message();await d.accept(msg.includes('email')?'qa@example.com':msg.includes('password')?'test-password':'save')}
-  else await d.accept();
+  else {await d.accept();finish();}
  });
  await page.locator('#text').click();
  await page.locator('#cloudProjects').click();
+ await completed;
  await expect(page.locator('.item')).toHaveCount(1);
 });
 
