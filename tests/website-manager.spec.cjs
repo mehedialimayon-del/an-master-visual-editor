@@ -145,3 +145,14 @@ test('keyboard undo and redo shortcuts do not interfere with text inputs', async
   await name.press('Control+z');
   await expect(page.locator('#canvas .item')).toHaveCount(1);
 });
+
+test('undo and redo preserve a new element after repeated property editing', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/');
+  const before = await page.locator('.stage .item').count();
+  await page.locator('#text').click();
+  await expect(page.locator('.stage .item')).toHaveCount(before + 1);
+  await page.locator('#undo').click();
+  await expect(page.locator('.stage .item')).toHaveCount(before);
+  await page.locator('#redo').click();
+  await expect(page.locator('.stage .item')).toHaveCount(before + 1);
+});
