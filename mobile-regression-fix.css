@@ -24,3 +24,6 @@
    min-width:55px;
  }
 }
+
+/* Tablet: allow direct inline text interaction. */
+@media (min-width:701px) and (max-width:900px) and (orientation:portrait){body #canvas .item[data-type="text"] .content{pointer-events:auto!important;cursor:text}body:not(.an-tablet-typing) header #text{display:inline-flex!important}}
