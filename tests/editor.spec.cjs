@@ -708,10 +708,12 @@ test('internal button page selector navigates, persists, exports and rebases aft
   await page.locator('#linkPage').selectOption('2');
   await page.locator('#save').click();
   await page.reload();
+  await page.locator('.item[data-type="button"]').click();
   await expect(page.locator('#linkPage')).toHaveValue('2');
   await page.locator('#page').selectOption('1');
   await page.locator('#deletePage').click();
   await page.locator('#page').selectOption('0');
+  await page.locator('.item[data-type="button"]').click();
   await expect(page.locator('#linkPage')).toHaveValue('1');
   await page.locator('#preview').click();
   await page.locator('.item[data-type="button"]').click();
