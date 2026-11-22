@@ -1,0 +1,26 @@
+/* Restore existing mobile/tablet editing controls after the reference-layout overlay.
+   Scoped to <=900px: desktop workspace and document data remain unchanged. */
+@media (max-width:900px) {
+ .mobile-dock button[data-panel="screen"],
+ .mobile-dock button[data-panel="page"] {
+   display:inline-flex!important;
+   flex-direction:column;
+   align-items:center;
+   justify-content:center;
+   flex:0 0 62px!important;
+   min-width:62px!important;
+   min-height:49px!important;
+   visibility:visible!important;
+ }
+ .mobile-dock {overflow-x:auto!important;scrollbar-width:thin!important}
+}
+@media (min-width:701px) and (max-width:900px) and (orientation:portrait) {
+ header #text {
+   display:inline-flex!important;
+   visibility:visible!important;
+   align-items:center;
+   justify-content:center;
+   flex:0 0 auto;
+   min-width:55px;
+ }
+}
