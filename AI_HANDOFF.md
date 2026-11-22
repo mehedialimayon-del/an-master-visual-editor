@@ -185,3 +185,6 @@ Stage 10 remains PENDING until these gates are satisfied.
 - Existing seven websites remain a link registry. Publish currently opens the manual publishing guide, NOT automatic deployment. No changes to localStorage keys, website repos or Supabase.
 - Known pending: real browser screenshot/pixel comparison, cross-browser and physical laptop QA, exact desktop canvas fit/zoom, complete seven-site source inventory, context-specific floating selection toolbar and real live publishing.
 - Next: inspect GitHub Actions latest runs, fix failures, and check desktop visual geometry; do not claim screenshot-perfect or verified functionality without browser evidence.
+
+## 2026-11-22 mobile regression fixes
+Run 45007053282: 41/51 pass, 10 fail. Fixed hidden mobile dock Page/Screen controls, tablet text button visibility, and duplicate Style accessible names. Files: index.html, mobile-regression-fix.css. Latest code SHA c159b6d3e9138e0a2d44904acd065568b6d2691c. Browser and Pages CI pending; verify final run before PASS. Seven website registry, localStorage, and Supabase unchanged.
