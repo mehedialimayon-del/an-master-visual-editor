@@ -188,3 +188,6 @@ Stage 10 remains PENDING until these gates are satisfied.
 
 ## 2026-11-22 mobile regression fixes
 Run 45007053282: 41/51 pass, 10 fail. Fixed hidden mobile dock Page/Screen controls, tablet text button visibility, and duplicate Style accessible names. Files: index.html, mobile-regression-fix.css. Latest code SHA c159b6d3e9138e0a2d44904acd065568b6d2691c. Browser and Pages CI pending; verify final run before PASS. Seven website registry, localStorage, and Supabase unchanged.
+
+## 2026-11-22 — Browser QA 45008815486 follow-up
+Baseline 46/51 PASS, 5 FAIL, Pages 45008815363 PASS. Actual shape UI now opens accessible Choose Shape dialog rather than legacy prompt; updated shape regression to click Ellipse in dialog. Renamed secondary v2 Animation and Layout buttons to Visual Animation and Visual Layout to prevent duplicate role names; secondary selection matching preserved. Tablet portrait text pointer events enabled. Tablet regression test action timeouts reduced to expose exact failing step in logs. Code/test commits 8c2ed263, cb259cbb, 903b1448, ec3842f9. Latest browser run 45009124133 and Pages 45009123800 pending; no 51/51 PASS claim. Seven website registry, Supabase and localStorage data unchanged.
