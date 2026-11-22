@@ -399,7 +399,7 @@ test('S23 Ultra portrait keeps editor narrow while switching real CSS viewport p
     ['1366x768', 1366, 768],
     ['1440x900', 1440, 900]
   ]) {
-    await device.selectOption(value);
+    await device.evaluate((el, next) => { el.value = next; el.dispatchEvent(new Event('change', { bubbles: true })); }, value);
     await expect(device).toHaveValue(value);
     const dims = await page.locator('.canvas').evaluate(el => ({
       ratio: getComputedStyle(el).aspectRatio,
