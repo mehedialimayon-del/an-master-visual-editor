@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 test('website manager add, duplicate, reload, remove and built-ins', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
-  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.locator('#myWebsites').click();
   const dialog = page.getByRole('dialog', { name: 'My Websites' });
   await expect(dialog.locator('.website-row')).toHaveCount(8);
   await expect(dialog.getByText('Field Force Hub')).toBeVisible();
@@ -12,7 +12,7 @@ test('website manager add, duplicate, reload, remove and built-ins', async ({ pa
   await dialog.getByRole('button', { name: '+ Add Website' }).click();
   await expect(dialog.locator('.website-row')).toHaveCount(9);
   await page.reload();
-  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.locator('#myWebsites').click();
   await expect(dialog.locator('.website-row')).toHaveCount(9);
   await dialog.getByPlaceholder('Website name').fill('Duplicate');
   await dialog.getByPlaceholder('https://your-site.example/').fill('https://qa.example.test/');
@@ -22,12 +22,12 @@ test('website manager add, duplicate, reload, remove and built-ins', async ({ pa
   await dialog.getByRole('button', { name: 'Remove QA Demo' }).click();
   await expect(dialog.locator('.website-row')).toHaveCount(8);
   await page.reload();
-  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.locator('#myWebsites').click();
   await expect(dialog.locator('.website-row')).toHaveCount(8);
 });
 test('invalid repository and built-in duplicates are rejected', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
-  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.locator('#myWebsites').click();
   const d = page.getByRole('dialog', { name: 'My Websites' });
   await d.getByPlaceholder('Website name').fill('Bad repo');
   await d.getByPlaceholder('https://your-site.example/').fill('https://qa2.example.test/');
@@ -50,7 +50,7 @@ test('existing editor canvas and tools are preserved', async ({ page }) => {
 
 test('built-in and custom website preview in canvas with safe return', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
-  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.locator('#myWebsites').click();
   const dialog = page.getByRole('dialog', { name: 'My Websites' });
   await dialog.getByRole('button', { name: 'Preview Field Force Hub in Canvas' }).click();
   const preview = page.getByRole('region', { name: 'Website preview: Field Force Hub' });
@@ -60,7 +60,7 @@ test('built-in and custom website preview in canvas with safe return', async ({ 
   await preview.getByRole('button', { name: 'Return to Editor' }).click();
   await expect(preview).toHaveCount(0);
   await expect(page.locator('#canvas')).toBeVisible();
-  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.locator('#myWebsites').click();
   await dialog.getByPlaceholder('Website name').fill('Custom preview');
   await dialog.getByPlaceholder('https://your-site.example/').fill('https://custom.example.test/');
   await dialog.getByRole('button', { name: '+ Add Website' }).click();
@@ -71,7 +71,7 @@ test('built-in and custom website preview in canvas with safe return', async ({ 
 
 test('responsive website preview changes real iframe viewport width', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
-  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.locator('#myWebsites').click();
   await page.getByRole('button', { name: 'Preview MA Tour & Travels in Canvas' }).click();
   const select = page.getByRole('combobox', { name: 'Website preview screen size' });
   const iframe = page.locator('#websiteCanvasPreview iframe');
@@ -89,7 +89,7 @@ test('responsive website preview changes real iframe viewport width', async ({ p
 
 test('preview offers original GitHub source without modifying the live website', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
-  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.locator('#myWebsites').click();
   await page.getByRole('button', { name: 'Preview Field Force Hub in Canvas' }).click();
   const source = page.getByRole('link', { name: 'Open Field Force Hub GitHub source' });
   await expect(source).toHaveAttribute('href', 'https://github.com/mehedialimayon-del/salesman-performance-app');
@@ -100,7 +100,7 @@ test('preview offers original GitHub source without modifying the live website',
 
 test('website manager provides direct GitHub source editing entry', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
-  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.locator('#myWebsites').click();
   const link = page.getByRole('link', { name: 'Edit A&N Overseas source in GitHub web editor' });
   await expect(link).toHaveAttribute('href', 'https://github.dev/mehedialimayon-del/an-overseas-education-');
   await expect(link).toHaveAttribute('target', '_blank');
@@ -109,7 +109,7 @@ test('website manager provides direct GitHub source editing entry', async ({ pag
 
 test('A&N exact live preview navigates to official website without iframe', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
-  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.locator('#myWebsites').click();
   const dialog = page.getByRole('dialog', { name: 'My Websites' });
   const row = dialog.locator('.website-row').filter({ hasText: 'A&N Overseas' });
   await expect(row.getByRole('button', { name: 'Preview A&N Overseas in Canvas' })).toHaveText('Open Exact Live View');
@@ -121,7 +121,7 @@ test('A&N exact live preview navigates to official website without iframe', asyn
 });
 test('custom website previews remain sandboxed', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
-  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.locator('#myWebsites').click();
   const dialog = page.locator('#websitePicker');
   await dialog.getByPlaceholder('Website name').fill('Custom sandbox test');
   await dialog.getByPlaceholder('https://your-site.example/').fill('https://example.com/');
@@ -140,7 +140,7 @@ test('keyboard undo and redo shortcuts do not interfere with text inputs', async
   await page.keyboard.press('Control+Shift+z');
   await expect(page.locator('#canvas .item')).toHaveCount(1);
   const name = page.locator('#newWebsiteName');
-  await page.getByRole('button', { name: 'My Websites' }).click();
+  await page.locator('#myWebsites').click();
   await name.fill('Draft text');
   await name.press('Control+z');
   await expect(page.locator('#canvas .item')).toHaveCount(1);
