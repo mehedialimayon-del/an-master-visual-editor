@@ -32,3 +32,15 @@ for(const viewport of [{width:768,height:1024},{width:800,height:1280}]){
   await expect(page.locator('#device')).toHaveValue('390x844');
  });
 }
+
+test('tablet inline text hides editing chrome while preserving canvas',async({page})=>{
+ await page.setViewportSize({width:800,height:1280});
+ await page.goto('http://127.0.0.1:4173/');
+ await page.locator('#text').click();
+ await page.locator('.item[data-type="text"] .content').first().click();
+ await expect(page.locator('body')).toHaveClass(/an-tablet-typing/);
+ await expect(page.locator('.tools')).toBeHidden();
+ await expect(page.locator('#canvas')).toBeVisible();
+ await page.locator('.item[data-type="text"] .content').first().press('Escape');
+ await expect(page.locator('body')).not.toHaveClass(/an-tablet-typing/);
+});
