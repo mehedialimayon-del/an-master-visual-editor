@@ -11,8 +11,14 @@ A single-file visual website editor hosted on GitHub Pages.
 - Local save/reload, bounded undo/redo for element creation and page operations.
 - Image upload optimization, fixed/scroll layout and multi-page HTML export with navigation.
 
-## QA status
-JavaScript parsing checked against the GitHub main file. **End-to-end browser and Android functional QA has not passed or been completed.** Do not consider Steps 1–5 finished. Undo/redo does not yet capture every property edit; responsive per-breakpoint layouts and component templates are incomplete. Export and image-loading performance require device testing.
+## QA status and release limitations (2026-11-22)
+- GitHub main `388462628de56d9ae89eee9842fe00134b76000e`: Visual Editor Browser QA **45/45 passed**, Website Manager Browser QA **42/42 passed** (on the preceding UI commit), GitHub Pages deployment passed and Android APK ZIP build passed.
+- Subsequent final-release test commit `3be6ec7dae396e575cbadf8ec3408ccc40cc3ef5` adds seven-website registry isolation and publishing-guide regression coverage. Refer to its GitHub Actions for the final result; never infer a PASS from the test source alone.
+- The seven built-in website entries are a registry of links. The editor does **not** synchronize or modify those external repositories. Additional website records and editor documents are saved in separate browser localStorage keys; those browser-specific records cannot be audited from GitHub alone.
+- Cloud editor project functions use the separate `an_mve` Supabase schema and authenticated user ownership checks. The browser uses a publishable key, not a service-role key.
+- **Publish is a manual guide**, not automatic deployment to a selected website. Export downloads standalone HTML; users must deploy it to the destination repository themselves.
+- Playwright mobile viewport and pointer simulations are not physical Samsung S23 Ultra or Android WebView functional certification. APK build success verifies compilation and archive integrity, not installed-device interactions.
+- Undo/redo and responsive behavior are covered by automated regression tests, but device-specific visual acceptance and production cloud account end-to-end tests require real devices and credentials.
 
 ## Planned stages
 1. Visual Editor Foundation
