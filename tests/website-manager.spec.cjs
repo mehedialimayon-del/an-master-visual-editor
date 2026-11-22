@@ -623,3 +623,22 @@ test('reference mobile editor has framed device presets and working navigation',
   const width=await page.locator('#canvas').evaluate(el=>el.getBoundingClientRect().width);
   expect(width).toBeLessThanOrEqual(384);
 });
+
+test('reference layout fits device frame between selectors and dock on S23 portrait', async ({page})=>{
+  await page.setViewportSize({width:384,height:854});
+  await page.goto('http://127.0.0.1:4173/');
+  for(const [name,value] of [['Mobile','390x844'],['Tablet','768x1024'],['Laptop','1366x768']]){
+    await page.locator('.an-reference-screenbar').getByRole('button',{name}).click();
+    await expect(page.locator('#device')).toHaveValue(value);
+    const metrics=await page.evaluate(()=>{
+      const bar=document.querySelector('.an-reference-screenbar').getBoundingClientRect();
+      const canvas=document.querySelector('#canvas').getBoundingClientRect();
+      const dock=document.querySelector('.mobile-dock').getBoundingClientRect();
+      return {barBottom:bar.bottom,canvasTop:canvas.top,canvasBottom:canvas.bottom,dockTop:dock.top,width:canvas.width};
+    });
+    expect(metrics.canvasTop).toBeGreaterThanOrEqual(metrics.barBottom);
+    expect(metrics.canvasBottom).toBeLessThanOrEqual(metrics.dockTop+1);
+    expect(metrics.width).toBeLessThanOrEqual(384);
+  }
+  await expect(page.locator('.mobile-dock [data-editor-shortcut="publish"]')).toBeVisible();
+});
