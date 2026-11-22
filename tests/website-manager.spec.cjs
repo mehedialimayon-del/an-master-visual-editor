@@ -749,10 +749,11 @@ test('demo live publish writes only demo-site path and does not store GitHub tok
  await page.getByRole('button',{name:'My Websites'}).click();
  page.on('dialog',d=>d.accept(d.type()==='prompt'?'test-token-never-store':undefined));
  await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
+ const importedSource=await page.evaluate(()=>demoSourceHtml);
  let requested=[];
  await page.route('https://api.github.com/repos/mehedialimayon-del/an-master-visual-editor/contents/demo-site/index.html',async route=>{
    const request=route.request();requested.push({method:request.method(),url:request.url(),authorization:request.headers()['authorization'],body:request.postDataJSON?.()});
-   if(request.method()==='GET')await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({sha:'demo-file-sha'})});
+   if(request.method()==='GET')await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({sha:'demo-file-sha',content:Buffer.from(importedSource,'utf8').toString('base64')})});
    else await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({content:{path:'demo-site/index.html'}})});
  });
  await page.locator('#publishDemo').click();
@@ -855,4 +856,20 @@ test('mobile visual shape chooser replaces blocking prompt',async({page})=>{
  await page.locator('.an-shape-options button').filter({hasText:'Ellipse'}).click();
  await expect(page.locator('.an-shape-chooser')).toHaveCount(0);
  expect(prompts).toBe(0);
+});
+
+test('demo publish refuses changed remote source without writing to GitHub',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.getByRole('button',{name:'My Websites'}).click();
+ page.on('dialog',d=>d.accept(d.type()==='prompt'?'test-ephemeral-token':undefined));
+ await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
+ const requests=[];
+ await page.route('https://api.github.com/repos/mehedialimayon-del/an-master-visual-editor/contents/demo-site/index.html',route=>{
+  requests.push(route.request().method());
+  return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({sha:'changed-sha',content:Buffer.from('<html>Someone else edited this demo</html>','utf8').toString('base64')})});
+ });
+ await page.locator('#publishDemo').click();
+ await expect.poll(()=>requests.length).toBe(1);
+ expect(requests).toEqual(['GET']);
+ await expect(page.locator('#publishDemo')).toBeEnabled();
 });
