@@ -673,3 +673,32 @@ test('final premium S23 chrome exposes menu, zoom fit and fixed toolbar without 
   await expect(page.locator('.mobile-dock [data-editor-shortcut="save"]')).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test('final release keeps seven built-in websites and custom registry unchanged across editor save and page navigation',async({page})=>{
+  await page.goto('http://127.0.0.1:4173/');
+  const baseline=await page.evaluate(()=>({builtins:ownedWebsites.map(x=>x.slice()),extras:localStorage.getItem('an-mve-extra-websites-v1')}));
+  expect(baseline.builtins).toHaveLength(7);
+  expect(new Set(baseline.builtins.map(x=>x[1])).size).toBe(7);
+  page.on('dialog',d=>d.accept(d.type()==='prompt'?'QA Temporary Page':undefined));
+  await page.locator('#newPage').click();
+  await page.locator('#page').selectOption('0');
+  await page.locator('#text').click();
+  await page.locator('#label').fill('Registry Preservation QA');
+  await page.locator('#save').click();
+  await page.reload();
+  const after=await page.evaluate(()=>({builtins:ownedWebsites.map(x=>x.slice()),extras:localStorage.getItem('an-mve-extra-websites-v1')}));
+  expect(after).toEqual(baseline);
+  await page.getByRole('button',{name:'My Websites'}).click();
+  const dialog=page.getByRole('dialog',{name:'My Websites'});
+  await expect(dialog.locator('.website-row')).toHaveCount(7);
+  for(const [name] of baseline.builtins)await expect(dialog.getByText(name,{exact:true})).toBeVisible();
+});
+test('publish control accurately explains manual export instead of claiming remote publishing',async({page})=>{
+  await page.setViewportSize({width:384,height:824});
+  await page.goto('http://127.0.0.1:4173/');
+  let notice='';
+  page.once('dialog',d=>{notice=d.message();d.accept()});
+  await page.locator('.mobile-dock [data-editor-shortcut="publish"]').click();
+  expect(notice).toContain('does not automatically publish');
+  expect(notice).toContain('Export HTML');
+});
