@@ -437,3 +437,31 @@ test('mobile-hosted laptop and tablet canvas maps element coordinates proportion
     expect(result.inside).toBeTruthy();
   }
 });
+
+test('S23 mobile canvas zoom, pan and fit controls preserve selected breakpoint', async ({ page }) => {
+  await page.setViewportSize({ width: 384, height: 854 });
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('#device').evaluate(el => {
+    el.value='1366x768';
+    el.dispatchEvent(new Event('change',{bubbles:true}));
+  });
+  const canvas=page.locator('#canvas');
+  const controls=page.locator('.an-viewport-controls');
+  await expect(controls).toBeVisible();
+  await controls.locator('[data-view-action="in"]').click();
+  await expect(canvas).toHaveAttribute('data-zoom','1.25');
+  await controls.locator('[data-view-action="pan"]').click();
+  await expect(controls.locator('[data-view-action="pan"]')).toHaveAttribute('aria-pressed','true');
+  const before=await page.locator('.stage').evaluate(el=>getComputedStyle(el).transform);
+  const bounds=await canvas.boundingBox();
+  await page.mouse.move(bounds.x+bounds.width/2,bounds.y+bounds.height/2);
+  await page.mouse.down();
+  await page.mouse.move(bounds.x+bounds.width/2+20,bounds.y+bounds.height/2+10,{steps:3});
+  await page.mouse.up();
+  const after=await page.locator('.stage').evaluate(el=>getComputedStyle(el).transform);
+  expect(after).not.toBe(before);
+  await controls.locator('[data-view-action="fit"]').click();
+  await expect(canvas).toHaveAttribute('data-zoom','1');
+  await expect(controls.locator('output')).toHaveText('100%');
+  await expect(page.locator('#device')).toHaveValue('1366x768');
+});
