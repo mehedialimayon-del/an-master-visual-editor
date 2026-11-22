@@ -1,0 +1,24 @@
+/* Tablet portrait: canvas-first workspace. Existing editor controls and storage untouched. */
+@media (min-width:701px) and (max-width:900px) and (orientation:portrait) {
+ html,body{width:100%;height:100dvh;overflow:hidden!important}
+ body{display:flex!important;flex-direction:column!important;min-width:0;background:#080b15!important}
+ body>header{flex:0 0 52px!important;height:52px!important;min-height:52px!important;max-height:52px!important;overflow-x:auto!important;overflow-y:hidden!important;flex-wrap:nowrap!important;white-space:nowrap;background:#090c16!important;border-bottom:1px solid #7935b1!important;padding:5px 9px!important;scrollbar-width:none}
+ body>header strong{width:auto!important;min-width:max-content;font-size:15px!important;color:#ff6500!important}
+ body>header button,body>header label{flex:none!important;min-height:36px!important;padding:6px 9px!important}
+ #designRibbon{flex:0 0 44px!important;max-height:44px!important;min-height:44px!important;overflow-x:auto!important;overflow-y:hidden!important;flex-wrap:nowrap!important;background:#101321!important;border-bottom:1px solid #8b3bc1!important;scrollbar-width:thin}
+ #designRibbon button{flex:none!important;white-space:nowrap!important}
+ #pageTrail{flex:0 0 35px!important;min-height:35px!important;max-height:35px!important;overflow-x:auto!important;overflow-y:hidden!important;margin:3px 8px!important;background:#101321!important;border:1px solid #803db4!important;border-radius:9px!important}
+ .canvas{flex:1 1 auto!important;align-self:center!important;width:auto!important;height:auto!important;max-width:calc(100vw - 20px)!important;max-height:calc(100dvh - 198px)!important;min-height:0!important;margin:4px auto!important;border:2px solid #a43adf!important;border-radius:12px!important;box-shadow:0 0 14px #7727ba66!important}
+ .mobile-dock{flex:0 0 53px!important;height:53px!important;min-height:53px!important;max-height:53px!important;position:relative!important;inset:auto!important;width:100%!important;display:flex!important;align-items:center!important;justify-content:space-around!important;overflow-x:auto!important;overflow-y:hidden!important;background:#0c0e1a!important;border-top:2px solid #8b37c9!important;padding:5px!important;z-index:45!important}
+ .mobile-dock button{flex:1 0 auto!important;max-width:115px!important;min-height:39px!important;background:#181b29!important;border:1px solid #7837aa!important;border-radius:10px!important;color:#fff!important}
+ .mobile-dock button.active,.mobile-dock button[aria-pressed=true]{background:#f60!important;border-color:#ff9b44!important}
+ .tools{display:none!important;position:fixed!important;left:8px!important;right:8px!important;top:auto!important;bottom:58px!important;width:auto!important;max-width:none!important;height:auto!important;max-height:min(52dvh,560px)!important;min-height:0!important;margin:0!important;padding:10px!important;overflow-y:auto!important;background:#101320!important;border:2px solid #963dd2!important;border-radius:15px!important;box-shadow:0 -10px 38px #000b!important;z-index:80!important}
+ .tools.sheet-open{display:flex!important;flex-wrap:wrap!important;align-content:start!important}
+ .tools .sheet-handle{position:sticky!important;top:0!important;z-index:3!important;background:#101320!important;width:100%!important}
+ .tools .sheet-tabs{width:100%!important;overflow-x:auto!important}
+ .tools [data-context-hidden=true],.tools [data-tab-hidden=true]{display:none!important}
+ #quickText{max-width:calc(100vw - 24px)!important}
+ #anDesktopBar,#anDesktopSidebar,#anDesktopMore{display:none!important}
+ #an-v2-controls{max-width:100%!important}
+ button:focus-visible{outline:2px solid #ff8a32!important;outline-offset:2px}
+}
