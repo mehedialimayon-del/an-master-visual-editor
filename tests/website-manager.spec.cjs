@@ -527,3 +527,14 @@ test('zoomed laptop canvas drag uses transformed coordinates and fit restores la
   await expect(page.locator('#canvas')).toHaveAttribute('data-zoom','1');
   await expect(page.locator('#device')).toHaveValue('1366x768');
 });
+
+test('stage 3 mobile text creation and image replace action labels follow selection', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('.mobile-dock [data-panel="text"]').click();
+  await expect(page.locator('.sheet-actions button[aria-label="Add Text"]')).toBeVisible();
+  await page.locator('.sheet-actions button[aria-label="Add Text"]').click();
+  await expect(page.locator('.stage .item[data-type="text"]')).toHaveCount(1);
+  await page.locator('.mobile-dock [data-panel="image"]').click();
+  await expect(page.locator('.sheet-actions button[aria-label="Add Image"]')).toBeVisible();
+});
