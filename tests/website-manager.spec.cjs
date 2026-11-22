@@ -688,7 +688,7 @@ test('final release keeps seven built-in websites and custom registry unchanged 
   await page.reload();
   const after=await page.evaluate(()=>({builtins:ownedWebsites.map(x=>x.slice()),extras:localStorage.getItem('an-mve-extra-websites-v1')}));
   expect(after).toEqual(baseline);
-  await page.getByRole('button',{name:'My Websites'}).click();
+  await page.locator('#myWebsites').click();
   const dialog=page.getByRole('dialog',{name:'My Websites'});
   await expect(dialog.locator('.website-row')).toHaveCount(8);
   for(const [name] of baseline.builtins)await expect(dialog.getByText(name,{exact:true})).toBeVisible();
@@ -706,7 +706,7 @@ test('publish control accurately explains manual export instead of claiming remo
 test('isolated demo website creates two editable pages, navigates and survives save reload without changing website registry',async({page})=>{
  await page.goto('http://127.0.0.1:4173/');
  const before=await page.evaluate(()=>({owned:JSON.stringify(ownedWebsites),extra:localStorage.getItem('an-mve-extra-websites-v1')}));
- await page.getByRole('button',{name:'My Websites'}).click();
+ await page.locator('#myWebsites').click();
  page.once('dialog',d=>d.accept());
  await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
  await expect(page.locator('#page option')).toHaveCount(2);
@@ -723,7 +723,7 @@ test('isolated demo website creates two editable pages, navigates and survives s
 
 test('eighth live demo appears as removable website and demo publishing is isolated',async({page})=>{
  await page.goto('http://127.0.0.1:4173/');
- await page.getByRole('button',{name:'My Websites'}).click();
+ await page.locator('#myWebsites').click();
  const dialog=page.getByRole('dialog',{name:'My Websites'});
  await expect(dialog.locator('.website-row')).toHaveCount(8);
  const demo=dialog.locator('.website-row').filter({hasText:'AN Live Demo Website'});
@@ -734,19 +734,19 @@ test('eighth live demo appears as removable website and demo publishing is isola
  page.once('dialog',d=>{notice=d.message();d.accept()});
  await page.locator('#publishDemo').click();
  expect(notice).toContain('Only the isolated two-page demo');
- await page.getByRole('button',{name:'My Websites'}).click();
+ await page.locator('#myWebsites').click();
  const removable=dialog.locator('.website-row').filter({hasText:'AN Live Demo Website'});
  page.once('dialog',d=>d.accept());
  await removable.getByRole('button',{name:'Remove AN Live Demo Website'}).click();
  await expect(dialog.locator('.website-row')).toHaveCount(7);
  await page.reload();
- await page.getByRole('button',{name:'My Websites'}).click();
+ await page.locator('#myWebsites').click();
  await expect(page.getByRole('dialog',{name:'My Websites'}).locator('.website-row')).toHaveCount(7);
 });
 
 test('demo live publish writes only demo-site path and does not store GitHub token',async({page})=>{
  await page.goto('http://127.0.0.1:4173/');
- await page.getByRole('button',{name:'My Websites'}).click();
+ await page.locator('#myWebsites').click();
  page.on('dialog',d=>d.accept(d.type()==='prompt'?'test-token-never-store':undefined));
  await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
  const importedSource=await page.evaluate(()=>demoSourceHtml);
@@ -769,7 +769,7 @@ test('demo live publish writes only demo-site path and does not store GitHub tok
 
 test('imports actual live demo HTML content rather than hardcoded sample pages',async({page})=>{
  await page.goto('http://127.0.0.1:4173/');
- await page.getByRole('button',{name:'My Websites'}).click();
+ await page.locator('#myWebsites').click();
  page.on('dialog',d=>d.accept());
  await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
  await expect(page.locator('#page option')).toHaveCount(2);
@@ -787,7 +787,7 @@ test('source-preserving demo import retains CSS, scripts, asset references and a
  await page.goto('http://127.0.0.1:4173/');
  const source='<!doctype html><html><head><style>@keyframes pulse{50%{opacity:.5}}.cta{animation:pulse 2s infinite}</style><script>window.demoOriginalScript=true;</script></head><body><main><section id="home"><h1>Live Original Heading</h1><p>Original description</p><a class="cta" href="#details">Explore</a><img src="./asset.png"></section><section id="details"><h2>Details</h2><a href="#home">Back</a></section></main></body></html>';
  await page.route('**/demo-site/',async route=>route.fulfill({status:200,contentType:'text/html',body:source}));
- await page.getByRole('button',{name:'My Websites'}).click();
+ await page.locator('#myWebsites').click();
  page.on('dialog',d=>d.accept());
  await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
  await expect(page.locator('#page option')).toHaveCount(2);
@@ -811,7 +811,7 @@ test('source-preserving editing applies changed CSS and animation without deleti
  await page.goto('http://127.0.0.1:4173/');
  const fixture='<!doctype html><html><head><style>.original{color:white}@keyframes spin{to{transform:rotate(1turn)}}</style><script>window.originalBehavior=1;</script></head><body><main><section id="home"><h1 class="original">Original heading</h1><a href="#details">Details</a></section><section id="details"><h2>Other page</h2><a href="#home">Home</a></section></main></body></html>';
  await page.route('**/demo-site/',route=>route.fulfill({status:200,contentType:'text/html',body:fixture}));
- await page.getByRole('button',{name:'My Websites'}).click();
+ await page.locator('#myWebsites').click();
  page.on('dialog',d=>d.accept());
  await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
  await expect(page.locator('#page option')).toHaveCount(2);
@@ -833,7 +833,7 @@ test('imported demo image is editable without losing original source scripts',as
  await page.goto('http://127.0.0.1:4173/');
  const source='<!doctype html><html><head><script>window.keepOriginal=true;</script></head><body><main><section id="home"><h1>Home</h1><img src="original.png"></section><section id="details"><h2>Details</h2></section></main></body></html>';
  await page.route('**/demo-site/',route=>route.fulfill({status:200,contentType:'text/html',body:source}));
- await page.getByRole('button',{name:'My Websites'}).click();
+ await page.locator('#myWebsites').click();
  page.on('dialog',d=>d.accept());
  await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
  const result=await page.evaluate(()=>{
@@ -860,7 +860,7 @@ test('mobile visual shape chooser replaces blocking prompt',async({page})=>{
 
 test('demo publish refuses changed remote source without writing to GitHub',async({page})=>{
  await page.goto('http://127.0.0.1:4173/');
- await page.getByRole('button',{name:'My Websites'}).click();
+ await page.locator('#myWebsites').click();
  page.on('dialog',d=>d.accept(d.type()==='prompt'?'test-ephemeral-token':undefined));
  await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
  const requests=[];
