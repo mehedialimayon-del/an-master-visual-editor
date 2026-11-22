@@ -3,7 +3,7 @@ test('website manager add, duplicate, reload, remove and built-ins', async ({ pa
   await page.goto('http://127.0.0.1:4173/');
   await page.getByRole('button', { name: 'My Websites' }).click();
   const dialog = page.getByRole('dialog', { name: 'My Websites' });
-  await expect(dialog.locator('.website-row')).toHaveCount(9);
+  await expect(dialog.locator('.website-row')).toHaveCount(8);
   await expect(dialog.getByText('Field Force Hub')).toBeVisible();
   await expect(dialog.getByText('AN Master Visual Editor')).toBeVisible();
   await dialog.getByPlaceholder('Website name').fill('QA Demo');
@@ -708,7 +708,7 @@ test('isolated demo website creates two editable pages, navigates and survives s
  const before=await page.evaluate(()=>({owned:JSON.stringify(ownedWebsites),extra:localStorage.getItem('an-mve-extra-websites-v1')}));
  await page.getByRole('button',{name:'My Websites'}).click();
  page.once('dialog',d=>d.accept());
- await page.getByRole('button',{name:'Edit Eighth Live Demo Website'}).click();
+ await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
  await expect(page.locator('#page option')).toHaveCount(2);
  await expect(page.locator('#currentPageTitle')).toHaveText('Demo Home');
  await page.locator('.item[data-type="button"]').click();
@@ -748,7 +748,7 @@ test('demo live publish writes only demo-site path and does not store GitHub tok
  await page.goto('http://127.0.0.1:4173/');
  await page.getByRole('button',{name:'My Websites'}).click();
  page.on('dialog',d=>d.accept(d.type()==='prompt'?'test-token-never-store':undefined));
- await page.getByRole('button',{name:'Edit Eighth Live Demo Website'}).click();
+ await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
  let requested=[];
  await page.route('https://api.github.com/repos/mehedialimayon-del/an-master-visual-editor/contents/demo-site/index.html',async route=>{
    const request=route.request();requested.push({method:request.method(),url:request.url(),authorization:request.headers()['authorization'],body:request.postDataJSON?.()});
@@ -764,4 +764,20 @@ test('demo live publish writes only demo-site path and does not store GitHub tok
  expect(requested[1].body.content.length).toBeGreaterThan(100);
  const stored=await page.evaluate(()=>JSON.stringify(localStorage));
  expect(stored).not.toContain('test-token-never-store');
+});
+
+test('imports actual live demo HTML content rather than hardcoded sample pages',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.getByRole('button',{name:'My Websites'}).click();
+ page.on('dialog',d=>d.accept());
+ await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
+ await expect(page.locator('#page option')).toHaveCount(2);
+ const imported=await page.evaluate(()=>pages.map(p=>p.items.map(i=>i.label)));
+ expect(imported[0]).toContain('Live Website Editing Test');
+ expect(imported[1]).toContain('Details Page');
+ expect(imported[0]).not.toContain('Welcome to AN Demo');
+ await page.locator('#save').click();
+ await page.reload();
+ const restored=await page.evaluate(()=>pages.map(p=>p.items.map(i=>i.label)));
+ expect(restored).toEqual(imported);
 });
