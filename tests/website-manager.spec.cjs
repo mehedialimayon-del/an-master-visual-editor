@@ -805,3 +805,25 @@ test('source-preserving demo import retains CSS, scripts, asset references and a
  expect(data.output).toContain('href="#details"');
  expect(data.output).not.toContain('Live Original Heading');
 });
+
+test('source-preserving editing applies changed CSS and animation without deleting original scripts',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ const fixture='<!doctype html><html><head><style>.original{color:white}@keyframes spin{to{transform:rotate(1turn)}}</style><script>window.originalBehavior=1;</script></head><body><main><section id="home"><h1 class="original">Original heading</h1><a href="#details">Details</a></section><section id="details"><h2>Other page</h2><a href="#home">Home</a></section></main></body></html>';
+ await page.route('**/demo-site/',route=>route.fulfill({status:200,contentType:'text/html',body:fixture}));
+ await page.getByRole('button',{name:'My Websites'}).click();
+ page.on('dialog',d=>d.accept());
+ await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
+ await expect(page.locator('#page option')).toHaveCount(2);
+ const html=await page.evaluate(()=>{
+  const item=pages[0].items.find(i=>i.label==='Original heading');
+  item.color='#ff6600';item.size=42;item.x+=16;item.effect='pulse';item.label='Changed heading';
+  return sourcePreservingDemoHtml();
+ });
+ expect(html).toContain('Changed heading');
+ expect(html).toContain('color: rgb(255, 102, 0)');
+ expect(html).toContain('font-size: 42px');
+ expect(html).toContain('an-mve-pulse');
+ expect(html).toContain('window.originalBehavior=1');
+ expect(html).toContain('@keyframes spin');
+ expect(html).toContain('href="#details"');
+});
