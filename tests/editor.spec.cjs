@@ -750,3 +750,22 @@ test('deleting a linked destination clears button target and internal page picke
   expect(link.url).toBe('');
   await expect(page.locator('#linkPage option')).toHaveCount(2);
 });
+
+test('reference mobile layout keeps canvas and compact tools in viewport',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4173/');
+ await expect(page.locator('#an-v2-controls')).toBeVisible();
+ await expect(page.locator('#canvas')).toBeVisible();
+ await expect(page.locator('.mobile-dock')).toBeVisible();
+ const sizes=await page.evaluate(()=>{const rect=x=>{const r=document.querySelector(x).getBoundingClientRect();return {top:r.top,bottom:r.bottom,height:r.height}};return {canvas:rect('#canvas'),dock:rect('.mobile-dock'),controls:rect('#an-v2-controls'),height:innerHeight}});
+ expect(sizes.canvas.height).toBeGreaterThan(100);
+ expect(sizes.canvas.bottom).toBeLessThanOrEqual(sizes.height+1);
+ expect(sizes.dock.bottom).toBeLessThanOrEqual(sizes.height+1);
+ await page.locator('.mobile-dock [data-panel="text"]').click();
+ await expect(page.locator('.tools')).toBeVisible();
+ const after=await page.evaluate(()=>({canvas:document.querySelector('#canvas').getBoundingClientRect().height,tools:document.querySelector('.tools').getBoundingClientRect().height}));
+ expect(after.canvas).toBeGreaterThan(80);
+ expect(after.tools).toBeLessThanOrEqual(220);
+ await page.locator('.an-v2-tabs button').filter({hasText:'Effects'}).click();
+ await expect(page.locator('.an-v2-gallery .sample.pulse')).toBeVisible();
+});
