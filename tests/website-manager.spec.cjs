@@ -388,3 +388,26 @@ test('mobile editing sheet shows text controls without duplicated gallery and re
   await page.locator('.mobile-dock [data-panel="screen"]').click();
   await expect(page.locator('.sheet-tabs button.active')).toHaveText('Screen');
 });
+
+test('S23 Ultra portrait keeps editor narrow while switching real CSS viewport presets', async ({ page }) => {
+  await page.setViewportSize({ width: 384, height: 854 });
+  await page.goto('http://127.0.0.1:4173/');
+  const device = page.locator('#device');
+  for (const [value, width, height] of [
+    ['320x640', 320, 640],
+    ['768x1024', 768, 1024],
+    ['1366x768', 1366, 768],
+    ['1440x900', 1440, 900]
+  ]) {
+    await device.selectOption(value);
+    await expect(device).toHaveValue(value);
+    const dims = await page.locator('.canvas').evaluate(el => ({
+      ratio: getComputedStyle(el).aspectRatio,
+      screenWidth: document.documentElement.clientWidth,
+      canvasWidth: el.getBoundingClientRect().width
+    }));
+    expect(dims.ratio).toBe(width + ' / ' + height);
+    expect(dims.screenWidth).toBe(384);
+    expect(dims.canvasWidth).toBeLessThanOrEqual(384);
+  }
+});
