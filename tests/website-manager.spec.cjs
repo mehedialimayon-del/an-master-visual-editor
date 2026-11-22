@@ -844,3 +844,15 @@ test('imported demo image is editable without losing original source scripts',as
  expect(result.html).toContain('window.keepOriginal=true');
  expect(result.html).not.toContain('src="original.png"');
 });
+
+test('mobile visual shape chooser replaces blocking prompt',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4173/');
+ let prompts=0;page.on('dialog',async d=>{if(d.type()==='prompt')prompts++;await d.dismiss()});
+ await page.locator('#ribbonShape').click();
+ await expect(page.locator('.an-shape-chooser')).toBeVisible();
+ await expect(page.locator('.an-shape-options button')).toHaveCount(3);
+ await page.locator('.an-shape-options button').filter({hasText:'Ellipse'}).click();
+ await expect(page.locator('.an-shape-chooser')).toHaveCount(0);
+ expect(prompts).toBe(0);
+});
