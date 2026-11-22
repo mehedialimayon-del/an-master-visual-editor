@@ -356,18 +356,20 @@ test('visual style presets appear for text and apply orange glow', async ({ page
   expect(changed).toEqual({ color: '#ff6600', effect: 'glow', shadow: 12 });
 });
 
-test('premium mobile icon dock opens contextual visual tool galleries', async ({ page }) => {
+test('premium mobile dock opens compact contextual controls without duplicate galleries', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/');
   await expect(page.locator('.mobile-dock .an-dock-icon')).toHaveCount(5);
   await page.locator('.mobile-dock [data-panel="image"]').click();
-  await expect(page.locator('.an-tool-gallery .an-tool-tile')).toHaveCount(4);
-  await page.getByRole('button', { name: 'Open Looks tools' }).click();
+  await expect(page.locator('.tools')).toHaveClass(/sheet-open/);
+  await expect(page.locator('.an-tool-gallery')).toBeHidden();
+  await expect(page.locator('.sheet-tabs button[data-tab="Image Looks"]')).toBeVisible();
+  await page.locator('.sheet-tabs button[data-tab="Image Looks"]').click();
   await expect(page.locator('.an-image-gallery')).toHaveClass(/visible/);
-  await page.getByRole('button', { name: 'Open Adjust tools' }).click();
+  await page.locator('.sheet-tabs button[data-tab="Image"]').click();
   await expect(page.locator('.an-image-gallery')).not.toHaveClass(/visible/);
   await page.locator('.mobile-dock [data-panel="text"]').click();
-  await page.getByRole('button', { name: 'Open Styles tools' }).click();
+  await page.locator('.sheet-tabs button[data-tab="Visual Styles"]').click();
   await expect(page.locator('.an-preset-wrap')).toHaveClass(/visible/);
 });
 
