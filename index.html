@@ -416,4 +416,4 @@ function drawLayers(){gallery.hidden=false;gallery.replaceChildren();const sourc
 function drawLayout(){gallery.hidden=false;gallery.replaceChildren();for(const [name,id]of [['Page','quickNewPage'],['Screen','goHomePage'],['Fit','none']]){const b=document.createElement('button');b.textContent=name;b.onclick=()=>id==='none'?zoom.click():document.getElementById(id)?.click();gallery.append(b)}}
 document.addEventListener('pointerup',e=>{if(e.target.closest('#canvas .item')){status.textContent='Element selected · Tap Text / Style / Effects below';if(e.target.closest('.item[data-type="text"]'))openTab('Text')}},true);
 })();
-</script><script defer src="./desktop-workspace.js"></script></body></html>
+</script><script defer src="./desktop-workspace.js"></script><script defer src="./tablet-keyboard.js"></script></body></html>
