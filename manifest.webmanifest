@@ -1,0 +1,18 @@
+{
+  "name": "AN Master Visual Editor",
+  "short_name": "AN Editor",
+  "description": "AN live visual website editor",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#FF6500",
+  "icons": [
+    {
+      "src": "./assets/an-visual-editor-icon.jpg",
+      "sizes": "any",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
