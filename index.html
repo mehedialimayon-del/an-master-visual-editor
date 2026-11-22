@@ -333,6 +333,56 @@ stage.addEventListener('pointerdown',e=>{const text=e.target.closest('.item[data
 stage.addEventListener('focusout',e=>{const text=e.target;if(!text.matches?.('.item[data-type="text"] .content[contenteditable="true"]'))return;const item=items.find(i=>i.id===text.closest('.item')?.dataset.itemId);if(item){const value=text.innerText;if(value!==item.label){remember();item.label=value;syncPage();const field=document.getElementById('label');if(field)field.value=value}}text.contentEditable='false'},true);
 const shape=document.getElementById('ribbonShape');if(shape)shape.onclick=()=>{document.querySelector('.an-shape-chooser')?.remove();const dialog=document.createElement('div');dialog.className='an-shape-chooser';dialog.innerHTML='<div class="an-shape-card" role="dialog" aria-modal="true" aria-label="Choose shape"><strong>Choose Shape</strong><div class="an-shape-options"></div><button type="button" class="an-shape-cancel">Cancel</button></div>';const options=dialog.querySelector('.an-shape-options');for(const kind of ['rectangle','ellipse','pill']){const button=document.createElement('button');button.type='button';button.innerHTML='<span class="'+kind+'"></span><small>'+kind[0].toUpperCase()+kind.slice(1)+'</small>';button.onclick=()=>{dialog.remove();add('shape');const item=items.find(i=>i.id===selected);if(item&&item.type==='shape'){item.shapeKind=kind;item.background='#ff6600';item.w=120;item.h=kind==='pill'?55:120;render()}};options.append(button)}dialog.querySelector('.an-shape-cancel').onclick=()=>dialog.remove();dialog.addEventListener('pointerdown',e=>{if(e.target===dialog)dialog.remove()});document.body.append(dialog)};
 })();
+</script><style id="an-reference-layout-v2">
+@media(max-width:700px){
+html,body{overflow:hidden!important;height:100dvh!important}
+body{display:flex!important;flex-direction:column!important;min-height:0!important}
+body>header{flex:0 0 auto!important;min-height:58px!important;max-height:68px!important;overflow:hidden!important}
+#designRibbon,#pageTrail,#quickText,.an-reference-screenbar{display:none!important}
+#canvas.canvas{flex:1 1 auto!important;min-height:0!important;height:auto!important;max-height:none!important;overflow:auto!important;margin:4px 10px!important;border:2px solid #a329ff!important;border-radius:12px!important;position:relative!important}
+.mobile-dock{position:relative!important;bottom:auto!important;left:auto!important;right:auto!important;order:20!important;flex:0 0 68px!important;display:flex!important;overflow-x:auto!important;overflow-y:hidden!important;gap:3px!important;background:#080d18!important;padding:5px!important;border-top:1px solid #394154!important;z-index:110!important}
+.mobile-dock button{min-width:60px!important;flex:1 0 auto!important;min-height:55px!important;border-radius:10px!important;padding:5px!important;font-size:12px!important}
+.mobile-dock button[data-panel="screen"],.mobile-dock button[data-panel="page"],.mobile-dock button[data-editor-shortcut="undo"],.mobile-dock button[data-editor-shortcut="redo"],.mobile-dock button[data-editor-shortcut="save"],.mobile-dock button[data-editor-shortcut="publish"]{display:none!important}
+.tools{order:21!important}
+.tools.sheet-open{position:relative!important;bottom:auto!important;left:auto!important;right:auto!important;flex:0 0 196px!important;max-height:196px!important;height:196px!important;min-height:0!important;width:100%!important;border-radius:12px 12px 0 0!important;overflow:auto!important;padding:8px 12px!important;box-shadow:none!important;z-index:105!important;background:#0b101c!important}
+.tools:not(.sheet-open){display:none!important}
+.tools.sheet-open .sheet-handle{position:sticky!important;top:0!important;background:#0b101c!important;z-index:2!important}
+.an-v2-controls{order:1!important;flex:0 0 auto!important;display:flex!important;flex-direction:column!important;gap:5px!important;padding:5px 10px!important;background:#080d18!important;border-bottom:1px solid #374151!important}
+.an-v2-controls .an-v2-row{display:flex;gap:6px;align-items:center}
+.an-v2-controls button{flex:1;min-width:0;background:#171e2d;color:white;border:1px solid #505767;border-radius:10px;padding:10px 3px;font-weight:600;font-size:12px}
+.an-v2-controls button.active{background:linear-gradient(130deg,#6c00ef,#bc22f9);border-color:#d67dff}
+.an-v2-controls .publish{background:#ff6500;color:#111;border-color:#ff6500}
+.an-v2-status{font-size:11px;color:#cbd5e1;padding:5px 7px;border:1px solid #343c4d;border-radius:8px}
+.an-v2-gallery{display:flex;gap:7px;overflow-x:auto;padding:7px 2px}
+.an-v2-gallery button{display:grid;gap:5px;place-items:center;min-width:76px;border:1px solid #4b5563;border-radius:10px;background:#182131;color:#fff;padding:7px}
+.an-v2-gallery .sample{font-size:22px;color:#ff6500;display:block;min-height:30px}
+.an-v2-gallery .sample.pulse{animation:an-v2-pulse 1.2s infinite}
+.an-v2-gallery .sample.fade{animation:an-v2-fade 1.5s infinite}
+.an-v2-gallery .sample.rise{animation:an-v2-rise 1.5s infinite}
+.an-v2-gallery .sample.glow{animation:an-v2-glow 1.3s infinite}
+@keyframes an-v2-pulse{50%{transform:scale(1.25)}}@keyframes an-v2-fade{50%{opacity:.2}}@keyframes an-v2-rise{50%{transform:translateY(-9px)}}@keyframes an-v2-glow{50%{text-shadow:0 0 16px #ff6500}}
+.an-v2-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 0}
+.an-v2-tabs button{background:#1c2331;color:white;border:1px solid #4b5563;border-radius:16px;padding:8px 14px;white-space:nowrap}
+.an-v2-tabs button.active{background:#7700e8;border-color:#ad54ff}
+}
+</style><script id="an-reference-layout-v2">
+(()=>{if(document.getElementById('an-v2-controls'))return;const canvas=document.getElementById('canvas'),dock=document.querySelector('.mobile-dock'),device=document.getElementById('device'),tools=document.querySelector('.tools');if(!canvas||!dock||!device||!tools)return;
+const controls=document.createElement('div');controls.id='an-v2-controls';controls.className='an-v2-controls';const action=document.createElement('div');action.className='an-v2-row';const view=document.createElement('div');view.className='an-v2-row';const status=document.createElement('div');status.className='an-v2-status';status.textContent='● Live Editing · Select an element on the canvas';controls.append(action,view,status);canvas.before(controls);
+function control(parent,name,handler,cls=''){const b=document.createElement('button');b.type='button';b.textContent=name;b.className=cls;b.onclick=handler;parent.append(b);return b}
+control(action,'↶ Undo',()=>document.getElementById('undo')?.click());control(action,'↷ Redo',()=>document.getElementById('redo')?.click());control(action,'◉ Preview',()=>document.getElementById('preview')?.click());control(action,'▣ Save',()=>document.getElementById('save')?.click());control(action,'☁ Publish',()=>document.getElementById('publishDemo')?.click()||document.getElementById('publishGuide')?.click(),'publish');
+for(const [name,val]of [['Mobile','390x844'],['Tablet','768x1024'],['Laptop','1366x768']]){const b=control(view,name,()=>{device.value=val;device.dispatchEvent(new Event('change',{bubbles:true}));update()});b.dataset.mode=val}
+const zoom=control(view,'Fit',()=>canvas.querySelector('[data-view-action="fit"]')?.click());zoom.title='Fit to screen';
+function update(){view.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===device.value));status.textContent=(device.value.startsWith('1366')?'Laptop / Desktop':device.value.startsWith('768')?'Tablet':'Mobile')+' View ('+device.value.replace('x',' × ')+')  ● Live Editing'}device.addEventListener('change',update);update();
+dock.replaceChildren();for(const [icon,name,fn]of [['↖','Select',()=>tools.classList.remove('sheet-open')],['T','Text',()=>document.getElementById('text')?.click()],['▧','Image',()=>document.getElementById('openAssets')?.click()],['◇','Shape',()=>document.getElementById('ribbonShape')?.click()],['▣','Button',()=>document.getElementById('button')?.click()],['▤','Section',()=>document.getElementById('ribbonShape')?.click()],['⊞','Layout',()=>openTab('Layout')],['▱','Layers',()=>openTab('Layers')]]){const b=document.createElement('button');b.type='button';b.innerHTML='<span style="display:block;font-size:23px">'+icon+'</span>'+name;b.onclick=fn;dock.append(b)}
+const tabs=document.createElement('nav');tabs.className='an-v2-tabs';tools.querySelector('.sheet-handle')?.after(tabs);
+function openTab(name){tools.classList.add('sheet-open');tabs.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.textContent===name));gallery.hidden=!['Effects','Animation','Shape'].includes(name);if(!gallery.hidden)drawGallery(name);if(name==='Text')document.getElementById('label')?.focus();if(name==='Layers')drawLayers();if(name==='Layout')drawLayout()}
+for(const name of ['Text','Style','Spacing','Effects','Animation','Layers','Layout'])control(tabs,name,()=>openTab(name));
+const gallery=document.createElement('div');gallery.className='an-v2-gallery';gallery.hidden=true;tabs.after(gallery);
+function drawGallery(kind){gallery.replaceChildren();const list=kind==='Shape'?['rectangle','ellipse','pill']:['none','pulse','fade','rise','glow','typing'];for(const name of list){const b=document.createElement('button');b.type='button';const sample=document.createElement('span');sample.className='sample '+name;sample.textContent=kind==='Shape'?(name==='rectangle'?'▭':name==='ellipse'?'◯':'▰'):'Aa';b.append(sample,document.createTextNode(name));b.onclick=()=>{if(kind==='Shape'){document.getElementById('ribbonShape')?.click();return}const select=document.getElementById('ribbonEffect');if(select){select.value=name;select.dispatchEvent(new Event('change',{bubbles:true}))}};gallery.append(b)}}
+function drawLayers(){gallery.hidden=false;gallery.replaceChildren();const source=typeof items!=='undefined'?items:[];for(const item of source){const b=document.createElement('button');b.textContent=(item.type||'Element')+' · '+String(item.label||'').slice(0,20);b.onclick=()=>{selected=item.id;render()};gallery.append(b)}}
+function drawLayout(){gallery.hidden=false;gallery.replaceChildren();for(const [name,id]of [['Page','quickNewPage'],['Screen','goHomePage'],['Fit','none']]){const b=document.createElement('button');b.textContent=name;b.onclick=()=>id==='none'?zoom.click():document.getElementById(id)?.click();gallery.append(b)}}
+document.addEventListener('pointerup',e=>{if(e.target.closest('#canvas .item')){status.textContent='Element selected · Tap Text / Style / Effects below';if(e.target.closest('.item[data-type="text"]'))openTab('Text')}},true);
+})();
 </script></body></html>';return html;}
 $('export').onclick=()=>{const html=buildExportHtml();let a=document.createElement('a');const blobUrl=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.href=blobUrl;a.download='visual-site.html';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(blobUrl),10000)};
 $('publishDemo').onclick=async()=>{
