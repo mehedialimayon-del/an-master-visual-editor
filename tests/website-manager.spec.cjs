@@ -873,3 +873,25 @@ test('demo publish refuses changed remote source without writing to GitHub',asyn
  expect(requests).toEqual(['GET']);
  await expect(page.locator('#publishDemo')).toBeEnabled();
 });
+
+test('isolated demo publish rollback restores prior content and refuses concurrent changes',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.getByRole('button',{name:'My Websites'}).first().click();
+ page.on('dialog',d=>d.accept(d.type()==='prompt'?'scoped-ephemeral-token':undefined));
+ await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
+ const original=await page.evaluate(()=>demoSourceHtml);
+ let remote=Buffer.from(original,'utf8').toString('base64'),sha='first-sha',writes=0;
+ await page.route('https://api.github.com/repos/mehedialimayon-del/an-master-visual-editor/contents/demo-site/index.html',async route=>{
+  const req=route.request();
+  if(req.method()==='GET')return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({sha,content:remote})});
+  const body=req.postDataJSON();expect(body.sha).toBe(sha);writes++;remote=body.content;sha='sha-'+writes;
+  return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({content:{sha}})});
+ });
+ await page.locator('#publishDemo').click();
+ await expect.poll(()=>writes).toBe(1);
+ await expect(page.locator('#rollbackDemo')).toBeEnabled();
+ await page.locator('#rollbackDemo').click();
+ await expect.poll(()=>writes).toBe(2);
+ expect(Buffer.from(remote,'base64').toString('utf8')).toBe(original);
+ await expect(page.locator('#rollbackDemo')).toBeDisabled();
+});
