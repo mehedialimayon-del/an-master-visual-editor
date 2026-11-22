@@ -176,3 +176,12 @@ Stage 10 remains PENDING until these gates are satisfied.
 - Switching viewports captures outgoing geometry automatically and restores target geometry by item ID; new elements fall back to proportional scaling. Undo/redo and localStorage retain breakpointLayouts.
 - Code commit 9604b489c66488e4a5f956c3614c19dfdb6d34d4; regression commit 6737167ef1d4dcd353088576920c6eaad9655767. Verify new Browser QA and Pages run before claiming PASS. Do not perform live Supabase tests.
 - Remaining release gates: physical Samsung touch/browser QA, authorized cloud E2E, and manual accessibility/security acceptance. Ten-stage roadmap only; do not invent Stage 11.
+
+## 2026-11-22 — Laptop desktop workspace Chat 2/5
+- User's final reference screenshot is target, not evidence of exact pixel parity.
+- Chat 1 audit recorded in DESKTOP_CHAT_1_AUDIT.md. Supabase an_mve schema exists in ai-work-agent project; do not modify unrelated data.
+- Added desktop-workspace.css and desktop-workspace.js, linked from index.html. Desktop-only >=901px: compact header, device/Save/Preview toolbar, collapsible left navigation and right contextual tools, Edit Mode OFF expanded canvas, secondary tools More popover. Existing mobile <=900px stays on prior CSS and controls.
+- Added tests/desktop-workspace.spec.cjs; browser-qa.yml now runs editor.spec.cjs plus desktop workspace suite. CI must be checked on latest commit before claiming PASS.
+- Existing seven websites remain a link registry. Publish currently opens the manual publishing guide, NOT automatic deployment. No changes to localStorage keys, website repos or Supabase.
+- Known pending: real browser screenshot/pixel comparison, cross-browser and physical laptop QA, exact desktop canvas fit/zoom, complete seven-site source inventory, context-specific floating selection toolbar and real live publishing.
+- Next: inspect GitHub Actions latest runs, fix failures, and check desktop visual geometry; do not claim screenshot-perfect or verified functionality without browser evidence.
