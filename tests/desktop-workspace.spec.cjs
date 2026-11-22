@@ -1,0 +1,33 @@
+const {test,expect}=require('@playwright/test');
+test('desktop workspace edit mode expands canvas and preserves editor',async({page})=>{
+ await page.setViewportSize({width:1440,height:900});
+ await page.goto('http://127.0.0.1:4173/');
+ const edit=page.locator('#anEditMode');
+ await expect(edit).toBeVisible();
+ await expect(page.locator('#anDesktopSidebar')).toBeVisible();
+ await expect(page.locator('.tools')).toBeVisible();
+ await edit.click();
+ await expect(page.locator('body')).toHaveClass(/an-desktop-focus/);
+ await expect(page.locator('#anDesktopSidebar')).toBeHidden();
+ await expect(page.locator('.tools')).toBeHidden();
+ await expect(page.locator('#canvas')).toBeVisible();
+ await edit.click();
+ await expect(page.locator('#anDesktopSidebar')).toBeVisible();
+ await expect(page.locator('.tools')).toBeVisible();
+ await page.locator('#anDesktopBar [data-view="768x1024"]').click();
+ await expect(page.locator('#device')).toHaveValue('768x1024');
+ await page.locator('#anDesktopBar [data-view="390x844"]').click();
+ await expect(page.locator('#device')).toHaveValue('390x844');
+ await page.locator('#anDesktopOptions').click();
+ await expect(page.locator('#anDesktopMore')).toHaveClass(/an-open/);
+ await page.keyboard.press('Escape');
+ await expect(page.locator('#anDesktopMore')).not.toHaveClass(/an-open/);
+});
+test('mobile existing controls stay visible without desktop chrome',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('http://127.0.0.1:4173/');
+ await expect(page.locator('#anDesktopBar')).toBeHidden();
+ await expect(page.locator('.mobile-dock')).toBeVisible();
+ await page.locator('.mobile-dock [data-panel="text"]').click();
+ await expect(page.locator('.tools')).toBeVisible();
+});
