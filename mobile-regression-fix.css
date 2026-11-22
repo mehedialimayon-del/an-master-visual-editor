@@ -27,3 +27,6 @@
 
 /* Tablet: allow direct inline text interaction. */
 @media (min-width:701px) and (max-width:900px) and (orientation:portrait){body #canvas .item[data-type="text"] .content{pointer-events:auto!important;cursor:text}body:not(.an-tablet-typing) header #text{display:inline-flex!important}}
+
+/* Keep the native screen-size selector usable in tablet portrait, including after Save/Reload. */
+@media (min-width:701px) and (max-width:900px) and (orientation:portrait){body>header label.device-picker:has(#device){display:inline-flex!important;visibility:visible!important;align-items:center!important;flex:0 0 auto!important}body>header #device{display:inline-block!important;visibility:visible!important;min-width:125px!important;max-width:170px!important}}
