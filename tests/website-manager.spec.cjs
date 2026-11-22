@@ -3,27 +3,27 @@ test('website manager add, duplicate, reload, remove and built-ins', async ({ pa
   await page.goto('http://127.0.0.1:4173/');
   await page.getByRole('button', { name: 'My Websites' }).click();
   const dialog = page.getByRole('dialog', { name: 'My Websites' });
-  await expect(dialog.locator('.website-row')).toHaveCount(8);
+  await expect(dialog.locator('.website-row')).toHaveCount(9);
   await expect(dialog.getByText('Field Force Hub')).toBeVisible();
   await expect(dialog.getByText('AN Master Visual Editor')).toBeVisible();
   await dialog.getByPlaceholder('Website name').fill('QA Demo');
   await dialog.getByPlaceholder('https://your-site.example/').fill('https://qa.example.test/');
   await dialog.getByPlaceholder('GitHub repository URL (optional)').fill('https://github.com/example/qa-demo');
   await dialog.getByRole('button', { name: '+ Add Website' }).click();
-  await expect(dialog.locator('.website-row')).toHaveCount(8);
+  await expect(dialog.locator('.website-row')).toHaveCount(9);
   await page.reload();
   await page.getByRole('button', { name: 'My Websites' }).click();
-  await expect(dialog.locator('.website-row')).toHaveCount(8);
+  await expect(dialog.locator('.website-row')).toHaveCount(9);
   await dialog.getByPlaceholder('Website name').fill('Duplicate');
   await dialog.getByPlaceholder('https://your-site.example/').fill('https://qa.example.test/');
   await dialog.getByRole('button', { name: '+ Add Website' }).click();
   await expect(dialog.getByRole('status')).toContainText('already added');
-  await expect(dialog.locator('.website-row')).toHaveCount(8);
+  await expect(dialog.locator('.website-row')).toHaveCount(9);
   await dialog.getByRole('button', { name: 'Remove QA Demo' }).click();
-  await expect(dialog.locator('.website-row')).toHaveCount(7);
+  await expect(dialog.locator('.website-row')).toHaveCount(8);
   await page.reload();
   await page.getByRole('button', { name: 'My Websites' }).click();
-  await expect(dialog.locator('.website-row')).toHaveCount(7);
+  await expect(dialog.locator('.website-row')).toHaveCount(8);
 });
 test('invalid repository and built-in duplicates are rejected', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
@@ -34,11 +34,11 @@ test('invalid repository and built-in duplicates are rejected', async ({ page })
   await d.getByPlaceholder('GitHub repository URL (optional)').fill('https://github.com/owner/repo/tree/main');
   await d.getByRole('button', { name: '+ Add Website' }).click();
   await expect(d.getByRole('status')).toContainText('GitHub repository URL');
-  await expect(d.locator('.website-row')).toHaveCount(7);
+  await expect(d.locator('.website-row')).toHaveCount(8);
   await d.getByPlaceholder('GitHub repository URL (optional)').fill('https://github.com/mehedialimayon-del/examarena-bd');
   await d.getByRole('button', { name: '+ Add Website' }).click();
   await expect(d.getByRole('status')).toContainText('already added');
-  await expect(d.locator('.website-row')).toHaveCount(7);
+  await expect(d.locator('.website-row')).toHaveCount(8);
 });
 test('existing editor canvas and tools are preserved', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/');
@@ -690,7 +690,7 @@ test('final release keeps seven built-in websites and custom registry unchanged 
   expect(after).toEqual(baseline);
   await page.getByRole('button',{name:'My Websites'}).click();
   const dialog=page.getByRole('dialog',{name:'My Websites'});
-  await expect(dialog.locator('.website-row')).toHaveCount(7);
+  await expect(dialog.locator('.website-row')).toHaveCount(8);
   for(const [name] of baseline.builtins)await expect(dialog.getByText(name,{exact:true})).toBeVisible();
 });
 test('publish control accurately explains manual export instead of claiming remote publishing',async({page})=>{
@@ -708,7 +708,7 @@ test('isolated demo website creates two editable pages, navigates and survives s
  const before=await page.evaluate(()=>({owned:JSON.stringify(ownedWebsites),extra:localStorage.getItem('an-mve-extra-websites-v1')}));
  await page.getByRole('button',{name:'My Websites'}).click();
  page.once('dialog',d=>d.accept());
- await page.getByRole('button',{name:'Create Isolated Demo Website'}).click();
+ await page.getByRole('button',{name:'Edit Eighth Live Demo Website'}).click();
  await expect(page.locator('#page option')).toHaveCount(2);
  await expect(page.locator('#currentPageTitle')).toHaveText('Demo Home');
  await page.locator('.item[data-type="button"]').click();
