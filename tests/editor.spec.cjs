@@ -694,3 +694,36 @@ test('independent breakpoint geometry preserves shared text edits across viewpor
  await page.locator('#device').selectOption('768x1024');
  await expect(page.locator('.item[data-type="text"]')).toContainText('Shared text survives breakpoint');
 });
+
+test('internal button page selector navigates, persists, exports and rebases after page deletion',async({page,context})=>{
+  await page.goto('http://127.0.0.1:4173/');
+  page.on('dialog',dialog=>dialog.accept(dialog.type()==='prompt'?'Target Page':undefined));
+  await page.locator('#newPage').click();
+  await page.locator('#newPage').click();
+  await page.locator('#page').selectOption('0');
+  await page.locator('#button').click();
+  await page.locator('#label').fill('Open Target');
+  const options=await page.locator('#linkPage option').allTextContents();
+  expect(options.some(v=>v.includes('Target Page'))).toBe(true);
+  await page.locator('#linkPage').selectOption('2');
+  await page.locator('#save').click();
+  await page.reload();
+  await expect(page.locator('#linkPage')).toHaveValue('2');
+  await page.locator('#page').selectOption('1');
+  await page.locator('#deletePage').click();
+  await page.locator('#page').selectOption('0');
+  await expect(page.locator('#linkPage')).toHaveValue('1');
+  await page.locator('#preview').click();
+  await page.locator('.item[data-type="button"]').click();
+  await expect(page.locator('#currentPageTitle')).toHaveText('Target Page');
+  await page.locator('#page').selectOption('0');
+  const downloadPromise=page.waitForEvent('download');
+  await page.locator('#export').click();
+  const download=await downloadPromise;
+  const html=require('fs').readFileSync(await download.path(),'utf8');
+  const exported=await context.newPage();
+  await exported.setContent(html);
+  await exported.locator('[data-page-link="1"]').click();
+  await expect(exported.locator('[data-site-page="1"]')).toBeVisible();
+  await exported.close();
+});
