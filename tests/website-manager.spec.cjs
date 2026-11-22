@@ -538,3 +538,40 @@ test('stage 3 mobile text creation and image replace action labels follow select
   await page.locator('.mobile-dock [data-panel="image"]').click();
   await expect(page.locator('.sheet-actions button[aria-label="Add Image"]')).toBeVisible();
 });
+
+test('stage 3 mobile text edit and effect survive save and reload', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  page.on('dialog', dialog => dialog.accept());
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('#text').evaluate(el=>el.click());
+  await page.locator('.mobile-dock [data-panel="text"]').click();
+  await page.locator('#label').fill('Stage 3 mobile heading');
+  await page.locator('.sheet-tabs button[data-tab="Animation"]').click();
+  await page.locator('#effect').selectOption('pulse');
+  await page.locator('#save').evaluate(el=>el.click());
+  await page.reload();
+  const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem('an-mve-v1')));
+  const item=stored.pages[stored.pageIndex].items.find(i=>i.type==='text');
+  expect(item.label).toBe('Stage 3 mobile heading');
+  expect(item.effect).toBe('pulse');
+  await expect(page.locator('.stage .item[data-type="text"]')).toHaveCount(1);
+});
+
+test('stage 3 mobile image upload and replace preserve identity after reload', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  page.on('dialog', dialog => dialog.accept());
+  await page.goto('http://127.0.0.1:4173/');
+  const pixel=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aGWQAAAAASUVORK5CYII=','base64');
+  await page.locator('#image').setInputFiles({name:'first.png',mimeType:'image/png',buffer:pixel});
+  await expect(page.locator('.stage .item[data-type="image"]')).toHaveCount(1);
+  const initial=await page.evaluate(()=>JSON.parse(localStorage.getItem('an-mve-v1')||'null'));
+  const id=await page.locator('.stage .item[data-type="image"]').getAttribute('data-item-id');
+  await page.locator('.mobile-dock [data-panel="image"]').click();
+  await expect(page.locator('.sheet-actions button[aria-label="Replace Selected Image"]')).toBeVisible();
+  await page.locator('#image').setInputFiles({name:'replacement.png',mimeType:'image/png',buffer:pixel});
+  await expect(page.locator('.stage .item[data-type="image"]')).toHaveCount(1);
+  await expect(page.locator('.stage .item[data-type="image"]')).toHaveAttribute('data-item-id',id);
+  await page.locator('#save').evaluate(el=>el.click());
+  await page.reload();
+  await expect(page.locator('.stage .item[data-type="image"]')).toHaveAttribute('data-item-id',id);
+});
