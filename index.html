@@ -336,7 +336,13 @@ $('publishDemo').onclick=async()=>{
  const button=$('publishDemo');button.disabled=true;button.textContent='Publishing Demo…';
  try{
   const current=await fetch(api,{headers,cache:'no-store'});if(!current.ok)throw Error('Cannot read demo source: HTTP '+current.status);
-  const file=await current.json();if(!file.sha)throw Error('Missing current file SHA');
+  const file=await current.json();if(!file.sha||typeof file.content!=='string')throw Error('Missing current file SHA or content');
+  // Optimistic concurrency: never overwrite a demo source changed after this editor imported it.
+  const original=demoSourceHtml||localStorage.getItem(demoSourceKey);
+  if(!original)throw Error('Import the live demo before publishing. Original source is unavailable.');
+  const decoded=Uint8Array.from(atob(file.content.replace(/\\s/g,'')),c=>c.charCodeAt(0));
+  const remote=new TextDecoder().decode(decoded);
+  if(remote.replace(/\\r\\n/g,'\\n')!==original.replace(/\\r\\n/g,'\\n'))throw Error('Publish conflict: live demo source changed since import. Re-import before publishing; no changes were written.');
   const html=sourcePreservingDemoHtml();const bytes=new TextEncoder().encode(html);let binary='';for(let n=0;n<bytes.length;n+=8192)binary+=String.fromCharCode(...bytes.subarray(n,n+8192));
   const response=await fetch(api,{method:'PUT',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({message:'test: publish edited isolated AN demo website',content:btoa(binary),sha:file.sha,branch:'main'})});
   if(!response.ok)throw Error('GitHub rejected publish: HTTP '+response.status+' '+(await response.text()).slice(0,200));
