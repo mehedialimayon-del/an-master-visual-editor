@@ -781,3 +781,27 @@ test('imports actual live demo HTML content rather than hardcoded sample pages',
  const restored=await page.evaluate(()=>pages.map(p=>p.items.map(i=>i.label)));
  expect(restored).toEqual(imported);
 });
+
+test('source-preserving demo import retains CSS, scripts, asset references and animations on edited publish',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ const source='<!doctype html><html><head><style>@keyframes pulse{50%{opacity:.5}}.cta{animation:pulse 2s infinite}</style><script>window.demoOriginalScript=true;<\\/script></head><body><main><section id="home"><h1>Live Original Heading</h1><p>Original description</p><a class="cta" href="#details">Explore</a><img src="./asset.png"></section><section id="details"><h2>Details</h2><a href="#home">Back</a></section></main></body></html>';
+ await page.route('**/demo-site/',async route=>route.fulfill({status:200,contentType:'text/html',body:source}));
+ await page.getByRole('button',{name:'My Websites'}).click();
+ page.on('dialog',d=>d.accept());
+ await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
+ await expect(page.locator('#page option')).toHaveCount(2);
+ const data=await page.evaluate(()=>{
+  const item=pages[0].items.find(i=>i.label==='Live Original Heading');
+  item.label='Edited on Live Demo';
+  return {original:demoSourceHtml,output:sourcePreservingDemoHtml(),selector:item.sourceSelector};
+ });
+ expect(data.original).toContain('window.demoOriginalScript=true');
+ expect(data.selector).toContain('#home');
+ expect(data.output).toContain('Edited on Live Demo');
+ expect(data.output).toContain('@keyframes pulse');
+ expect(data.output).toContain('window.demoOriginalScript=true');
+ expect(data.output).toContain('./asset.png');
+ expect(data.output).toContain('animation:pulse 2s infinite');
+ expect(data.output).toContain('href="#details"');
+ expect(data.output).not.toContain('Live Original Heading');
+});
