@@ -1,0 +1,35 @@
+/* Desktop-only canvas-first workspace. Mobile styles are untouched. */
+@media (min-width: 901px) {
+ html,body{width:100%;max-width:100%;height:100dvh;overflow:hidden!important}
+ body{--an-left:208px;--an-right:290px;--an-top:166px;display:flex!important;flex-direction:column!important;position:relative}
+ body.an-desktop-focus{--an-left:0px;--an-right:0px}
+ header{height:64px!important;max-height:64px!important;min-height:64px!important;flex:0 0 64px!important;overflow:hidden!important;flex-wrap:nowrap!important;white-space:nowrap;gap:7px!important;background:#090d17!important;border-bottom:1px solid #ff6500;padding:8px 12px!important}
+ header strong{flex:none!important;min-width:195px;color:white!important;font-size:17px!important}
+ header>button,header>label{flex:none}
+ header>button:not(.an-desktop-essential),header>label:not(.an-desktop-essential){display:none!important}
+ header .an-desktop-essential{display:inline-flex!important;align-items:center;min-height:40px!important}
+ header .device-picker.an-desktop-essential{font-size:12px!important}
+ #anDesktopBar{height:49px;flex:none;display:flex;gap:7px;align-items:center;padding:5px 12px;background:#10121d;border-bottom:1px solid #642f8d;overflow:hidden;z-index:20}
+ #anDesktopBar button{white-space:nowrap;padding:8px 12px;min-height:36px;background:#171a27;border:1px solid #654d82}
+ #anDesktopBar button[aria-pressed=true],#anDesktopBar .an-accent{background:#ff6500;border-color:#ff8b35;color:white}
+ #anDesktopBar .an-spacer{flex:1}
+ #anDesktopSidebar{position:fixed;left:8px;top:122px;bottom:12px;width:calc(var(--an-left) - 16px);padding:10px;background:#111521;border:1px solid #783bb0;border-radius:12px;overflow:auto;z-index:19}
+ #anDesktopSidebar button{display:block;width:100%;text-align:left;margin:4px 0;border:1px solid #343b4a;background:#171b28;padding:11px}
+ #anDesktopSidebar h2{font-size:15px;margin:4px 0 13px;color:#ff6500}
+ body.an-desktop-focus #anDesktopSidebar,body.an-desktop-focus .tools{display:none!important}
+ #pageTrail{flex:none!important;margin-left:var(--an-left)!important;margin-right:var(--an-right)!important;min-width:0;max-width:none!important}
+ .canvas{flex:0 1 auto!important;align-self:center!important;margin:8px auto!important;max-width:calc(100vw - var(--an-left) - var(--an-right) - 28px)!important;max-height:calc(100dvh - 184px)!important;min-height:0!important}
+ body:not(.an-desktop-focus) .canvas{transform:translateX(calc((var(--an-left) - var(--an-right))/2))}
+ .tools{display:flex!important;position:fixed!important;top:122px!important;right:8px!important;bottom:12px!important;left:auto!important;width:calc(var(--an-right) - 16px)!important;max-width:none!important;max-height:none!important;min-height:0!important;height:auto!important;margin:0!important;overflow:auto!important;align-content:start!important;padding:12px!important;background:#121521!important;border:1px solid #783bb0!important;border-radius:12px!important;z-index:19}
+ .tools label{max-width:100%;flex-wrap:wrap}
+ .tools input,.tools select{max-width:100%}
+ .tools .sheet-handle{display:flex!important;position:sticky;top:0;width:100%;background:#121521;z-index:4;justify-content:space-between}
+ .tools .sheet-tabs{display:flex!important;gap:4px;width:100%;overflow-x:auto}
+ .tools [data-context-hidden=true],.tools [data-tab-hidden=true]{display:none!important}
+ #anDesktopMore{position:fixed;top:122px;right:calc(var(--an-right) + 10px);width:min(440px,calc(100vw - 40px));max-height:60dvh;overflow:auto;display:none;flex-wrap:wrap;gap:7px;padding:12px;background:#171b27;border:1px solid #ff6500;border-radius:12px;z-index:60;box-shadow:0 14px 45px #000b}
+ #anDesktopMore.an-open{display:flex}
+ #anDesktopMore button{font-size:12px}
+ body.an-desktop-focus #anDesktopMore{right:12px}
+ #anDesktopBar button:focus-visible,#anDesktopSidebar button:focus-visible{outline:2px solid #ff8a32}
+}
+@media(max-width:900px){#anDesktopBar,#anDesktopSidebar,#anDesktopMore{display:none!important}}
