@@ -603,3 +603,23 @@ test('stage 3 selected text opens editable content in compact mobile bottom shee
   await page.locator('#label').fill('Updated mobile heading');
   await expect(page.locator('.stage .item[data-type="text"]')).toContainText('Updated mobile heading');
 });
+
+test('reference mobile editor has framed device presets and working navigation', async ({page})=>{
+  await page.setViewportSize({width:384,height:854});
+  await page.goto('http://127.0.0.1:4173/');
+  const bar=page.locator('.an-reference-screenbar');
+  await expect(bar).toBeVisible();
+  await bar.getByRole('button',{name:'Tablet'}).click();
+  await expect(page.locator('#device')).toHaveValue('768x1024');
+  await expect(page.locator('#canvas')).toHaveAttribute('data-an-frame','tablet');
+  await bar.getByRole('button',{name:'Laptop'}).click();
+  await expect(page.locator('#device')).toHaveValue('1366x768');
+  await expect(page.locator('#canvas')).toHaveAttribute('data-an-frame','laptop');
+  await bar.getByRole('button',{name:'Mobile'}).click();
+  await expect(page.locator('#device')).toHaveValue('390x844');
+  await expect(page.locator('#canvas')).toHaveAttribute('data-an-frame','mobile');
+  await expect(page.locator('.mobile-dock [data-editor-shortcut="save"]')).toBeVisible();
+  await expect(page.locator('.mobile-dock [data-panel="text"]')).toBeVisible();
+  const width=await page.locator('#canvas').evaluate(el=>el.getBoundingClientRect().width);
+  expect(width).toBeLessThanOrEqual(384);
+});
