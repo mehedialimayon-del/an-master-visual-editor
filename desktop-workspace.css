@@ -3,10 +3,10 @@
  html,body{width:100%;max-width:100%;height:100dvh;overflow:hidden!important}
  body{--an-left:208px;--an-right:290px;--an-top:166px;display:flex!important;flex-direction:column!important;position:relative}
  body.an-desktop-focus{--an-left:0px;--an-right:0px}
- header{height:64px!important;max-height:64px!important;min-height:64px!important;flex:0 0 64px!important;overflow:hidden!important;flex-wrap:nowrap!important;white-space:nowrap;gap:7px!important;background:#090d17!important;border-bottom:1px solid #ff6500;padding:8px 12px!important}
+ header{height:64px!important;max-height:64px!important;min-height:64px!important;flex:0 0 64px!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:thin;flex-wrap:nowrap!important;white-space:nowrap;gap:7px!important;background:#090d17!important;border-bottom:1px solid #ff6500;padding:8px 12px!important}
  header strong{flex:none!important;min-width:195px;color:white!important;font-size:17px!important}
  header>button,header>label{flex:none}
- header>button:not(.an-desktop-essential),header>label:not(.an-desktop-essential){display:none!important}
+ header>button:not(.an-desktop-essential),header>label:not(.an-desktop-essential){display:inline-flex!important;align-items:center}
  header .an-desktop-essential{display:inline-flex!important;align-items:center;min-height:40px!important}
  header .device-picker.an-desktop-essential{font-size:12px!important}
  #anDesktopBar{height:49px;flex:none;display:flex;gap:7px;align-items:center;padding:5px 12px;background:#10121d;border-bottom:1px solid #642f8d;overflow:hidden;z-index:20}
