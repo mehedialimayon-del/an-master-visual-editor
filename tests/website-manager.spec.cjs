@@ -784,7 +784,7 @@ test('imports actual live demo HTML content rather than hardcoded sample pages',
 
 test('source-preserving demo import retains CSS, scripts, asset references and animations on edited publish',async({page})=>{
  await page.goto('http://127.0.0.1:4173/');
- const source='<!doctype html><html><head><style>@keyframes pulse{50%{opacity:.5}}.cta{animation:pulse 2s infinite}</style><script>window.demoOriginalScript=true;<\\/script></head><body><main><section id="home"><h1>Live Original Heading</h1><p>Original description</p><a class="cta" href="#details">Explore</a><img src="./asset.png"></section><section id="details"><h2>Details</h2><a href="#home">Back</a></section></main></body></html>';
+ const source='<!doctype html><html><head><style>@keyframes pulse{50%{opacity:.5}}.cta{animation:pulse 2s infinite}</style><script>window.demoOriginalScript=true;</script></head><body><main><section id="home"><h1>Live Original Heading</h1><p>Original description</p><a class="cta" href="#details">Explore</a><img src="./asset.png"></section><section id="details"><h2>Details</h2><a href="#home">Back</a></section></main></body></html>';
  await page.route('**/demo-site/',async route=>route.fulfill({status:200,contentType:'text/html',body:source}));
  await page.getByRole('button',{name:'My Websites'}).click();
  page.on('dialog',d=>d.accept());
