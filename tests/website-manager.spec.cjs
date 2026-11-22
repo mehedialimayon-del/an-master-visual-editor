@@ -743,3 +743,25 @@ test('eighth live demo appears as removable website and demo publishing is isola
  await page.getByRole('button',{name:'My Websites'}).click();
  await expect(page.getByRole('dialog',{name:'My Websites'}).locator('.website-row')).toHaveCount(7);
 });
+
+test('demo live publish writes only demo-site path and does not store GitHub token',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.getByRole('button',{name:'My Websites'}).click();
+ page.on('dialog',d=>d.accept(d.type()==='prompt'?'test-token-never-store':undefined));
+ await page.getByRole('button',{name:'Edit Eighth Live Demo Website'}).click();
+ let requested=[];
+ await page.route('https://api.github.com/repos/mehedialimayon-del/an-master-visual-editor/contents/demo-site/index.html',async route=>{
+   const request=route.request();requested.push({method:request.method(),url:request.url(),authorization:request.headers()['authorization'],body:request.postDataJSON?.()});
+   if(request.method()==='GET')await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({sha:'demo-file-sha'})});
+   else await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({content:{path:'demo-site/index.html'}})});
+ });
+ await page.locator('#publishDemo').click();
+ await expect.poll(()=>requested.length).toBe(2);
+ expect(requested.map(x=>x.method)).toEqual(['GET','PUT']);
+ expect(requested.every(x=>x.url.endsWith('/contents/demo-site/index.html'))).toBe(true);
+ expect(requested[1].body.branch).toBe('main');
+ expect(requested[1].body.sha).toBe('demo-file-sha');
+ expect(requested[1].body.content.length).toBeGreaterThan(100);
+ const stored=await page.evaluate(()=>JSON.stringify(localStorage));
+ expect(stored).not.toContain('test-token-never-store');
+});
