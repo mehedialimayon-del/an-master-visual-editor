@@ -574,3 +574,18 @@ test('stage 3 mobile image upload and replace preserve identity after reload', a
   await page.reload();
   await expect(page.locator('.stage .item[data-type="image"]')).toHaveAttribute('data-item-id',id);
 });
+
+test('premium editor chrome uses black orange white instead of legacy purple on S23', async ({ page }) => {
+  await page.setViewportSize({ width: 384, height: 854 });
+  await page.goto('http://127.0.0.1:4173/');
+  const colors=await page.evaluate(()=>{
+    const header=getComputedStyle(document.querySelector('header'));
+    const dock=getComputedStyle(document.querySelector('.mobile-dock'));
+    return {header:header.backgroundColor,dock:dock.backgroundColor,border:dock.borderTopColor};
+  });
+  expect(colors.header).toBe('rgb(16, 16, 16)');
+  expect(colors.dock).toBe('rgb(16, 16, 16)');
+  const styles=await page.evaluate(()=>[...document.querySelectorAll('style')].map(x=>x.textContent).join(''));
+  expect(styles).not.toContain('#7220b5');
+  expect(styles).not.toContain('#8b25e8');
+});
