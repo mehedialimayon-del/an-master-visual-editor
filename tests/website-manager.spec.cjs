@@ -642,3 +642,15 @@ test('reference layout fits device frame between selectors and dock on S23 portr
   }
   await expect(page.locator('.mobile-dock [data-editor-shortcut="publish"]')).toBeVisible();
 });
+
+test('editor boot has no JavaScript page errors and reference controls initialize',async({page})=>{
+  const errors=[];
+  page.on('pageerror',error=>errors.push(error.message));
+  await page.setViewportSize({width:384,height:854});
+  await page.goto('http://127.0.0.1:4173/');
+  await expect(page.locator('.an-reference-screenbar')).toBeVisible();
+  await expect(page.locator('.mobile-dock [data-editor-shortcut="save"]')).toBeVisible();
+  await page.locator('#text').evaluate(el=>el.click());
+  await expect(page.locator('.stage .item[data-type="text"]')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
