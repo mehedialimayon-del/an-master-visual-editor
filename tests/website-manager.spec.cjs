@@ -411,3 +411,29 @@ test('S23 Ultra portrait keeps editor narrow while switching real CSS viewport p
     expect(dims.canvasWidth).toBeLessThanOrEqual(384);
   }
 });
+
+test('mobile-hosted laptop and tablet canvas maps element coordinates proportionally', async ({ page }) => {
+  await page.setViewportSize({ width: 384, height: 854 });
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('#text').evaluate(el => el.click());
+  for (const [width, height] of [[768, 1024], [1366, 768]]) {
+    const value = width + 'x' + height;
+    await page.locator('#device').evaluate((el, next) => {
+      el.value = next;
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    }, value);
+    const result = await page.evaluate(() => {
+      const canvas = document.querySelector('.canvas').getBoundingClientRect();
+      const item = document.querySelector('.stage .item').getBoundingClientRect();
+      return { canvasWidth: canvas.width, viewportWidth: document.documentElement.clientWidth,
+        relativeX: (item.left - canvas.left) / canvas.width,
+        relativeY: (item.top - canvas.top) / canvas.height,
+        inside: item.left >= canvas.left && item.right <= canvas.right + 1 };
+    });
+    expect(result.canvasWidth).toBeLessThanOrEqual(result.viewportWidth);
+    expect(result.relativeX).toBeGreaterThanOrEqual(0);
+    expect(result.relativeX).toBeLessThan(1);
+    expect(result.relativeY).toBeGreaterThanOrEqual(0);
+    expect(result.inside).toBeTruthy();
+  }
+});
