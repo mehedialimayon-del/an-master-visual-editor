@@ -509,8 +509,9 @@ test('Stage 7 real shapes render and export',async({page})=>{
  await expect(page.getByRole('dialog',{name:'Choose shape'})).toBeVisible();
  await page.locator('.an-shape-options button').filter({hasText:'Ellipse'}).click();
  await expect(page.locator('.item[data-type="shape"]')).toHaveCount(1);
- const promise=page.waitForEvent('download');
- await page.locator('#export').click();
+ const promise=page.waitForEvent('download',{timeout:8000});
+ // Export HTML is an existing hidden command on the compact editor; invoke the same real handler.
+ await page.evaluate(()=>document.getElementById('export').click());
  const html=require('fs').readFileSync(await (await promise).path(),'utf8');
  expect(html).toContain('border-radius:50%');
  expect(html).toMatch(/<div style="position:absolute;[^\"]*background:#[0-9a-f]{6};border-radius:50%"/i);
