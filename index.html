@@ -139,6 +139,10 @@ header strong::before{content:'✦';display:inline-grid;place-items:center;width
 .an-reference-screenbar button{flex:0 0 auto;background:#172235;border:1px solid #34435b;color:#fff;border-radius:9px;padding:9px 11px;min-height:36px;font-size:12px;font-weight:700}
 .an-reference-screenbar button.active{background:#ff6500;color:#111;border-color:#ff6500}
 .an-reference-screenbar button:focus-visible{outline:2px solid white}
+.an-reference-screenbar button[aria-pressed="true"]{background:#ff6500!important;color:#101010!important;border-color:#ff6500!important}
+#canvas{max-height:calc(100dvh - 225px)!important;min-height:0!important;aspect-ratio:var(--an-viewport-width,390) / var(--an-viewport-height,640)!important}
+#canvas .stage{overflow:hidden}
+.mobile-dock button[data-editor-shortcut="publish"]{background:#ff6500!important;color:#101010!important;border-color:#ff6500!important}
 #canvas{border:3px solid #ff6500!important;border-radius:19px!important;box-shadow:0 0 0 5px #172132,0 10px 25px #000b!important;min-height:120px!important;margin:12px auto!important;flex:0 1 auto!important}
 #canvas[data-an-frame="tablet"]{border-radius:14px!important;box-shadow:0 0 0 7px #172132,0 10px 25px #000b!important}
 #canvas[data-an-frame="laptop"]{border-radius:6px!important;box-shadow:0 0 0 5px #172132,0 9px 22px #000b!important}
@@ -236,7 +240,7 @@ for(const [name,value] of buttons){const b=document.createElement('button');b.ty
 const fit=document.createElement('button');fit.type='button';fit.textContent='Fit';fit.setAttribute('aria-label','Fit device preview');fit.onclick=()=>canvas.querySelector('[data-view-action="fit"]')?.click();bar.append(fit);
 const preview=document.createElement('button');preview.type='button';preview.textContent='Preview';preview.onclick=()=>document.getElementById('preview')?.click();bar.append(preview);
 canvas.before(bar);
-for(const [name,id] of [['Select',null],['Undo','undo'],['Redo','redo'],['Save','save'],['Publish','export']]){const b=document.createElement('button');b.type='button';b.textContent=name;b.dataset.editorShortcut=name.toLowerCase();b.onclick=()=>{if(id)document.getElementById(id)?.click();else document.querySelector('.tools.sheet-open #closeSheet')?.click()};dock.append(b)}
+for(const [name,id] of [['Select',null],['Undo','undo'],['Redo','redo'],['Save','save'],['Publish','publishGuide']]){const b=document.createElement('button');b.type='button';b.textContent=name;b.dataset.editorShortcut=name.toLowerCase();b.onclick=()=>{if(id)document.getElementById(id)?.click();else document.querySelector('.tools.sheet-open #closeSheet')?.click()};dock.append(b)}
 function update(){const value=device.value;const w=parseInt(value,10);const mode=w>=1100?'laptop':w>=700?'tablet':'mobile';canvas.dataset.anFrame=mode;bar.querySelectorAll('[data-preview-device]').forEach(b=>{const active=b.dataset.previewDevice===value;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))})}
 device.addEventListener('change',update);update();
 })();
