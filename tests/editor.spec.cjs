@@ -729,3 +729,24 @@ test('internal button page selector navigates, persists, exports and rebases aft
   await expect(exported.locator('[data-site-page="1"]')).toBeVisible();
   await exported.close();
 });
+
+test('deleting a linked destination clears button target and internal page picker takes priority',async({page})=>{
+  await page.goto('http://127.0.0.1:4173/');
+  await page.evaluate(()=>{
+    pages.push({name:'Destination',items:[]});
+    pages[0].items.push({id:'internal-link-test',type:'button',label:'Go',linkPage:'1',url:'https://example.com/',x:20,y:20,w:130,h:45,size:16,color:'#fff'});
+    render();
+  });
+  await page.locator('.item[data-item-id="internal-link-test"]').click();
+  await expect(page.locator('#linkPage')).toHaveValue('1');
+  const fields=await page.locator('.tools label').allTextContents();
+  expect(fields.some(x=>x.includes('Open Page'))).toBe(true);
+  await page.locator('#page').selectOption('1');
+  page.once('dialog',d=>d.accept());
+  await page.locator('#deletePage').click();
+  await page.locator('#page').selectOption('0');
+  const link=await page.evaluate(()=>pages[0].items.find(x=>x.id==='internal-link-test'));
+  expect(link.linkPage).toBe('');
+  expect(link.url).toBe('');
+  await expect(page.locator('#linkPage option')).toHaveCount(2);
+});
