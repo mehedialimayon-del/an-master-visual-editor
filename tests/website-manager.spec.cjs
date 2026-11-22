@@ -589,3 +589,17 @@ test('premium editor chrome uses black orange white instead of legacy purple on 
   expect(styles).not.toContain('#7220b5');
   expect(styles).not.toContain('#8b25e8');
 });
+
+test('stage 3 selected text opens editable content in compact mobile bottom sheet', async ({ page }) => {
+  await page.setViewportSize({ width: 384, height: 854 });
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('#text').evaluate(el=>el.click());
+  await page.locator('.mobile-dock [data-panel="text"]').click();
+  const edit=page.getByRole('button',{name:'Edit Selected Text'});
+  await expect(edit).toBeVisible();
+  await edit.click();
+  await expect(page.locator('.sheet-tabs button[data-tab="Content"]')).toHaveClass(/active/);
+  await expect(page.locator('#label')).toBeFocused();
+  await page.locator('#label').fill('Updated mobile heading');
+  await expect(page.locator('.stage .item[data-type="text"]')).toContainText('Updated mobile heading');
+});
