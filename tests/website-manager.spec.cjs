@@ -465,3 +465,35 @@ test('S23 mobile canvas zoom, pan and fit controls preserve selected breakpoint'
   await expect(controls.locator('output')).toHaveText('100%');
   await expect(page.locator('#device')).toHaveValue('1366x768');
 });
+
+test('S23 touch pinch zoom uses two pointers and fit resets transform', async ({ page }) => {
+  await page.setViewportSize({ width: 384, height: 854 });
+  await page.goto('http://127.0.0.1:4173/');
+  const canvas=page.locator('#canvas');
+  await canvas.evaluate(el=>{
+    const send=(type,id,x,y)=>el.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,pointerId:id,pointerType:'touch',clientX:x,clientY:y,isPrimary:id===1}));
+    send('pointerdown',1,80,140);
+    send('pointerdown',2,180,140);
+    send('pointermove',2,260,140);
+    send('pointerup',2,260,140);
+    send('pointerup',1,80,140);
+  });
+  await expect.poll(async()=>Number(await canvas.getAttribute('data-zoom'))).toBeGreaterThan(1);
+  await page.locator('.an-viewport-controls [data-view-action="fit"]').click();
+  await expect(canvas).toHaveAttribute('data-zoom','1');
+});
+
+test('S23 mobile element touch drag respects scaled stage coordinate', async ({ page }) => {
+  await page.setViewportSize({ width: 384, height: 854 });
+  await page.goto('http://127.0.0.1:4173/');
+  await page.locator('#text').evaluate(el=>el.click());
+  const item=page.locator('.stage .item').first();
+  const initial=await item.evaluate(el=>parseFloat(el.style.left));
+  const box=await item.boundingBox();
+  await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
+  await page.mouse.down();
+  await page.mouse.move(box.x+box.width/2+24,box.y+box.height/2+8,{steps:4});
+  await page.mouse.up();
+  const moved=await item.evaluate(el=>parseFloat(el.style.left));
+  expect(moved).toBeGreaterThan(initial);
+});
