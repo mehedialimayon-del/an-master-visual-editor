@@ -663,7 +663,7 @@ test('final premium S23 chrome exposes menu, zoom fit and fixed toolbar without 
   await expect(menu).toBeVisible();
   await expect(page.locator('#canvas')).toHaveAttribute('data-an-frame','mobile');
   await page.locator('#canvas [data-view-action="in"]').click();
-  await expect(page.locator('#canvas')).toHaveAttribute('data-zoom',/1\\.25|1\\.2/);
+  await expect(page.locator('#canvas')).toHaveAttribute('data-zoom',/1\.25|1\.2/);
   await page.locator('.an-reference-screenbar').getByRole('button',{name:'Fit'}).click();
   await expect(page.locator('#canvas')).toHaveAttribute('data-zoom','1');
   await menu.click();
