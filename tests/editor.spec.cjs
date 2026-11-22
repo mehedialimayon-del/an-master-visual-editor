@@ -505,9 +505,9 @@ test('Stage 5 cancelling deletion keeps page and undo history intact',async({pag
 
 test('Stage 7 real shapes render and export',async({page})=>{
  await page.goto('http://127.0.0.1:4173/');
- await page.locator('#ribbonShape').click();
+ await page.locator('#ribbonShape').click({timeout:5000});
  await expect(page.getByRole('dialog',{name:'Choose shape'})).toBeVisible();
- await page.locator('.an-shape-options button').filter({hasText:'Ellipse'}).click();
+ await page.locator('.an-shape-options button').filter({hasText:'Ellipse'}).click({timeout:5000});
  await expect(page.locator('.item[data-type="shape"]')).toHaveCount(1);
  const promise=page.waitForEvent('download',{timeout:8000});
  // Export HTML is an existing hidden command on the compact editor; invoke the same real handler.
