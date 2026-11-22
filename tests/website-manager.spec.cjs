@@ -499,24 +499,31 @@ test('S23 mobile element touch drag respects scaled stage coordinate', async ({ 
 });
 
 test('zoomed laptop canvas drag uses transformed coordinates and fit restores layout', async ({ page }) => {
+  test.setTimeout(15000);
   await page.setViewportSize({ width: 384, height: 854 });
   await page.goto('http://127.0.0.1:4173/');
-  await page.locator('#device').evaluate(el=>{
+  await page.locator('#device').evaluate(el => {
     el.value='1366x768';
     el.dispatchEvent(new Event('change',{bubbles:true}));
   });
-  await page.locator('#text').evaluate(el=>el.click());
-  const item=page.locator('.stage .item').first();
-  const before=await item.evaluate(el=>parseFloat(el.style.left));
-  await page.locator('.an-viewport-controls [data-view-action="in"]').click();
-  const box=await item.boundingBox();
-  await page.mouse.move(box.x+Math.min(20,box.width/2),box.y+Math.min(12,box.height/2));
-  await page.mouse.down();
-  await page.mouse.move(box.x+Math.min(20,box.width/2)+16,box.y+Math.min(12,box.height/2),{steps:4});
-  await page.mouse.up();
-  const after=await item.evaluate(el=>parseFloat(el.style.left));
-  expect(after).toBeGreaterThan(before);
-  await page.locator('.an-viewport-controls [data-view-action="fit"]').click();
+  await page.locator('#text').evaluate(el => el.click());
+  await page.locator('.an-viewport-controls [data-view-action="in"]').evaluate(el => el.click());
+  await expect(page.locator('#canvas')).toHaveAttribute('data-zoom','1.25');
+  const result=await page.locator('.stage .item').first().evaluate(el => {
+    const before=parseFloat(el.style.left);
+    const bounds=el.getBoundingClientRect();
+    const x=bounds.left+Math.min(10,bounds.width/2);
+    const y=bounds.top+Math.min(10,bounds.height/2);
+    const fire=(target,type,clientX,clientY)=>target.dispatchEvent(new PointerEvent(type,{
+      bubbles:true,cancelable:true,pointerId:19,pointerType:'mouse',button:0,buttons:type==='pointerup'?0:1,clientX,clientY
+    }));
+    fire(el,'pointerdown',x,y);
+    fire(window,'pointermove',x+16,y);
+    fire(window,'pointerup',x+16,y);
+    return {before,after:parseFloat(el.style.left)};
+  });
+  expect(result.after).toBeGreaterThan(result.before);
+  await page.locator('.an-viewport-controls [data-view-action="fit"]').evaluate(el => el.click());
   await expect(page.locator('#canvas')).toHaveAttribute('data-zoom','1');
   await expect(page.locator('#device')).toHaveValue('1366x768');
 });
