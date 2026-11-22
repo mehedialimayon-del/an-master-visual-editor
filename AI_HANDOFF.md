@@ -194,3 +194,6 @@ Baseline 46/51 PASS, 5 FAIL, Pages 45008815363 PASS. Actual shape UI now opens a
 
 ## 2026-11-22 — Final three regression fixes
 Run 45009137013: 48 PASS, 3 FAIL. Tablet 768/800 logs show native #device select hidden after Save/Reload; restored tablet portrait native picker in mobile-regression-fix.css. Shape test timed out while clicking hidden #export in compact layout; test now invokes the existing real export handler through DOM click (as other export tests already do) and awaits actual downloaded HTML. Commits e56de906 and 856fcc62. Recheck latest 51-test CI and Pages deployment before claiming PASS. No website registry, Supabase schema or localStorage data changes.
+
+## 2026-11-22 — Shape desktop pointer interception root cause
+Browser QA 45010461746: 50/51 PASS; Pages 45010461740 SUCCESS. Exact Playwright error: `#ribbonShape` is visible but desktop `#anDesktopSidebar` heading intercepts pointer events. Root fix in `desktop-workspace.css`: position and layer `#designRibbon` above sidebar and reserve 44px ribbon height while preserving sidebar interactions. Commit 7a58586140ca7915590c339e6f3edfa911414e2b. New Browser QA and Pages deployment on this docs commit must be checked before 51/51 PASS claim. No website registry, mobile styling, localStorage or Supabase changes.
