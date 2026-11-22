@@ -561,10 +561,9 @@ test('stage 3 mobile image upload and replace preserve identity after reload', a
   await page.setViewportSize({ width: 390, height: 844 });
   page.on('dialog', dialog => dialog.accept());
   await page.goto('http://127.0.0.1:4173/');
-  const pixel=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aGWQAAAAASUVORK5CYII=','base64');
+  const pixel=Buffer.from(await page.evaluate(() => { const canvas=document.createElement('canvas');canvas.width=2;canvas.height=2;canvas.getContext('2d').fillRect(0,0,2,2);return canvas.toDataURL('image/png').split(',')[1] }), 'base64');
   await page.locator('#image').setInputFiles({name:'first.png',mimeType:'image/png',buffer:pixel});
   await expect(page.locator('.stage .item[data-type="image"]')).toHaveCount(1);
-  const initial=await page.evaluate(()=>JSON.parse(localStorage.getItem('an-mve-v1')||'null'));
   const id=await page.locator('.stage .item[data-type="image"]').getAttribute('data-item-id');
   await page.locator('.mobile-dock [data-panel="image"]').click();
   await expect(page.locator('.sheet-actions button[aria-label="Replace Selected Image"]')).toBeVisible();
