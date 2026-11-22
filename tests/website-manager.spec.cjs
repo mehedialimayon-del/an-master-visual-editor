@@ -654,3 +654,22 @@ test('editor boot has no JavaScript page errors and reference controls initializ
   await expect(page.locator('.stage .item[data-type="text"]')).toHaveCount(1);
   expect(errors).toEqual([]);
 });
+
+test('final premium S23 chrome exposes menu, zoom fit and fixed toolbar without page errors', async ({page})=>{
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.setViewportSize({width:384,height:854});
+  await page.goto('http://127.0.0.1:4173/');
+  const menu=page.getByRole('button',{name:'Open editor menu'});
+  await expect(menu).toBeVisible();
+  await expect(page.locator('#canvas')).toHaveAttribute('data-an-frame','mobile');
+  await page.locator('#canvas [data-view-action="in"]').click();
+  await expect(page.locator('#canvas')).toHaveAttribute('data-zoom',/1\\.25|1\\.2/);
+  await page.locator('.an-reference-screenbar').getByRole('button',{name:'Fit'}).click();
+  await expect(page.locator('#canvas')).toHaveAttribute('data-zoom','1');
+  await menu.click();
+  await expect(page.locator('.tools')).toHaveClass(/sheet-open/);
+  await page.locator('#closeSheet').click();
+  await expect(page.locator('.tools')).not.toHaveClass(/sheet-open/);
+  await expect(page.locator('.mobile-dock [data-editor-shortcut="save"]')).toBeVisible();
+  expect(errors).toEqual([]);
+});
