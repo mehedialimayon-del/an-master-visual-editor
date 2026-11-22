@@ -3,7 +3,7 @@ test('website manager add, duplicate, reload, remove and built-ins', async ({ pa
   await page.goto('http://127.0.0.1:4173/');
   await page.getByRole('button', { name: 'My Websites' }).click();
   const dialog = page.getByRole('dialog', { name: 'My Websites' });
-  await expect(dialog.locator('.website-row')).toHaveCount(7);
+  await expect(dialog.locator('.website-row')).toHaveCount(8);
   await expect(dialog.getByText('Field Force Hub')).toBeVisible();
   await expect(dialog.getByText('AN Master Visual Editor')).toBeVisible();
   await dialog.getByPlaceholder('Website name').fill('QA Demo');
@@ -719,4 +719,27 @@ test('isolated demo website creates two editable pages, navigates and survives s
  await expect(page.locator('#page option')).toHaveCount(2);
  const after=await page.evaluate(()=>({owned:JSON.stringify(ownedWebsites),extra:localStorage.getItem('an-mve-extra-websites-v1')}));
  expect(after).toEqual(before);
+});
+
+test('eighth live demo appears as removable website and demo publishing is isolated',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ await page.getByRole('button',{name:'My Websites'}).click();
+ const dialog=page.getByRole('dialog',{name:'My Websites'});
+ await expect(dialog.locator('.website-row')).toHaveCount(8);
+ const demo=dialog.locator('.website-row').filter({hasText:'AN Live Demo Website'});
+ await expect(demo.getByRole('button',{name:'Edit Demo Website'})).toBeVisible();
+ await expect(demo.getByRole('link',{name:/Live Website/})).toHaveAttribute('href',/\/demo-site\/$/);
+ await page.locator('#closeWebsites').click();
+ let notice='';
+ page.once('dialog',d=>{notice=d.message();d.accept()});
+ await page.locator('#publishDemo').click();
+ expect(notice).toContain('Only the isolated two-page demo');
+ await page.getByRole('button',{name:'My Websites'}).click();
+ const removable=dialog.locator('.website-row').filter({hasText:'AN Live Demo Website'});
+ page.once('dialog',d=>d.accept());
+ await removable.getByRole('button',{name:'Remove AN Live Demo Website'}).click();
+ await expect(dialog.locator('.website-row')).toHaveCount(7);
+ await page.reload();
+ await page.getByRole('button',{name:'My Websites'}).click();
+ await expect(page.getByRole('dialog',{name:'My Websites'}).locator('.website-row')).toHaveCount(7);
 });
