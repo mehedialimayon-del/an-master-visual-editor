@@ -20,3 +20,11 @@ for (let i = 0; i < scripts.length; i += 1) {
   }
 }
 console.log('PASS: Parsed ' + scripts.length + ' inline JavaScript blocks in index.html.');
+
+// External editor scripts must parse before browser regressions begin.
+for (const filename of ['desktop-workspace.js', 'tablet-keyboard.js']) {
+  const external = path.join(__dirname, '..', filename);
+  if (!fs.existsSync(external)) throw new Error('Missing editor script: ' + filename);
+  new vm.Script(fs.readFileSync(external, 'utf8'), { filename });
+}
+console.log('PASS: External desktop and tablet JavaScript syntax.');
