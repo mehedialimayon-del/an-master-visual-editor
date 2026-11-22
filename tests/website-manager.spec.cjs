@@ -827,3 +827,20 @@ test('source-preserving editing applies changed CSS and animation without deleti
  expect(html).toContain('@keyframes spin');
  expect(html).toContain('href="#details"');
 });
+
+test('imported demo image is editable without losing original source scripts',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ const source='<!doctype html><html><head><script>window.keepOriginal=true;</script></head><body><main><section id="home"><h1>Home</h1><img src="original.png"></section><section id="details"><h2>Details</h2></section></main></body></html>';
+ await page.route('**/demo-site/',route=>route.fulfill({status:200,contentType:'text/html',body:source}));
+ await page.getByRole('button',{name:'My Websites'}).click();
+ page.on('dialog',d=>d.accept());
+ await page.getByRole('button',{name:'Import Eighth Live Demo Website'}).click();
+ const result=await page.evaluate(()=>{
+  const img=pages[0].items.find(i=>i.type==='image');if(!img)return null;
+  img.src='updated.png';return {selector:img.sourceSelector,html:sourcePreservingDemoHtml()};
+ });
+ expect(result).not.toBeNull();
+ expect(result.html).toContain('src="updated.png"');
+ expect(result.html).toContain('window.keepOriginal=true');
+ expect(result.html).not.toContain('src="original.png"');
+});
