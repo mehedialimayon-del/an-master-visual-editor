@@ -702,3 +702,21 @@ test('publish control accurately explains manual export instead of claiming remo
   expect(notice).toContain('does not automatically publish');
   expect(notice).toContain('Export HTML');
 });
+
+test('isolated demo website creates two editable pages, navigates and survives save reload without changing website registry',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/');
+ const before=await page.evaluate(()=>({owned:JSON.stringify(ownedWebsites),extra:localStorage.getItem('an-mve-extra-websites-v1')}));
+ await page.getByRole('button',{name:'My Websites'}).click();
+ page.once('dialog',d=>d.accept());
+ await page.getByRole('button',{name:'Create Isolated Demo Website'}).click();
+ await expect(page.locator('#page option')).toHaveCount(2);
+ await expect(page.locator('#currentPageTitle')).toHaveText('Demo Home');
+ await page.locator('.item[data-type="button"]').click();
+ await expect(page.locator('#linkPage')).toHaveValue('1');
+ await page.locator('#save').click();
+ await page.reload();
+ await expect(page.locator('#currentPageTitle')).toHaveText('Demo Home');
+ await expect(page.locator('#page option')).toHaveCount(2);
+ const after=await page.evaluate(()=>({owned:JSON.stringify(ownedWebsites),extra:localStorage.getItem('an-mve-extra-websites-v1')}));
+ expect(after).toEqual(before);
+});
